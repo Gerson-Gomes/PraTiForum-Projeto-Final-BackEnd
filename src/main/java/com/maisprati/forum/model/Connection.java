@@ -1,12 +1,21 @@
 package com.maisprati.forum.model;
 
+
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
-
 @Entity
 @Table(name = "connections")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Connection {
 
     @Id
@@ -15,45 +24,16 @@ public class Connection {
 
     @ManyToOne
     @JoinColumn(name = "follower_id", nullable = false)
+    @NotNull
     private User follower;
 
     @ManyToOne
     @JoinColumn(name = "followed_id", nullable = false)
+    @NotNull
     private User followed;
 
     @Column(name = "followed_date", nullable = false, updatable = false)
     private LocalDateTime followedAt = LocalDateTime.now();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getFollower() {
-        return follower;
-    }
-
-    public void setFollower(User follower) {
-        this.follower = follower;
-    }
-
-    public User getFollowed() {
-        return followed;
-    }
-
-    public void setFollowed(User followed) {
-        this.followed = followed;
-    }
-
-    public LocalDateTime getFollowedAt() {
-        return followedAt;
-    }
-
-    public void setFollowedAt(LocalDateTime followedAt) {
-        this.followedAt = followedAt;
-    }
-
 }
+
+

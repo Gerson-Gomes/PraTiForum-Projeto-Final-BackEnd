@@ -1,10 +1,18 @@
 package com.maisprati.forum.model;
+;
 
 import jakarta.persistence.*;
-
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 @Entity
 @Table(name = "users_social_midia")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserSocialMidia {
 
     @Id
@@ -26,53 +34,5 @@ public class UserSocialMidia {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getGitProfile() {
-        return gitProfile;
-    }
-
-    public void setGitProfile(String gitProfile) {
-        this.gitProfile = gitProfile;
-    }
-
-    public String getDiscordProfile() {
-        return discordProfile;
-    }
-
-    public void setDiscordProfile(String discordProfile) {
-        this.discordProfile = discordProfile;
-    }
-
-    public String getLinkedinProfile() {
-        return linkedinProfile;
-    }
-
-    public void setLinkedinProfile(String linkedinProfile) {
-        this.linkedinProfile = linkedinProfile;
-    }
-
-    public String getInstagramProfile() {
-        return instagramProfile;
-    }
-
-    public void setInstagramProfile(String instagramProfile) {
-        this.instagramProfile = instagramProfile;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
 }
+
