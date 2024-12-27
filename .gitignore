@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Ignorar o arquivo application-prod.yaml
+src/main/resources/application-prod.yaml

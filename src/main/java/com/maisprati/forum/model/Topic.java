@@ -1,12 +1,23 @@
 package com.maisprati.forum.model;
 
+
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "topics")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Topic {
 
     @Id
@@ -14,9 +25,13 @@ public class Topic {
     private Long id;
 
     @Column(name = "title", length = 100, nullable = false, unique = true)
+    @Size(max = 100)
+    @NotNull
     private String title;
 
     @Column(name = "content", length = 600, nullable = false)
+    @Size(max = 600)
+    @NotNull
     private String content;
 
     @Column(name = "creation_date",updatable = false)
@@ -27,8 +42,8 @@ public class Topic {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @NotNull
     private User user;
-
 
     @ManyToMany
     @JoinTable(
@@ -47,89 +62,10 @@ public class Topic {
     private List<User> usersWhoFavorited;
 
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Response> respons;
-
+    private List<Response> responses;
 
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Response> likes;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public LocalDateTime getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(LocalDateTime creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public LocalDateTime getLastEditionDate() {
-        return lastEditionDate;
-    }
-
-    public void setLastEditionDate(LocalDateTime lastEditionDate) {
-        this.lastEditionDate = lastEditionDate;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public List<User> getUsersWhoFavorited() {
-        return usersWhoFavorited;
-    }
-
-    public void setUsersWhoFavorited(List<User> usersWhoFavorited) {
-        this.usersWhoFavorited = usersWhoFavorited;
-    }
-
-    public List<Response> getResponses() {
-        return respons;
-    }
-
-    public void setResponses(List<Response> comments) {
-        this.respons = comments;
-    }
-
-    public List<Response> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(List<Response> likes) {
-        this.likes = likes;
-    }
+    private List<Like> likes;
 }
+
+
