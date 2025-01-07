@@ -12,7 +12,7 @@ public class ForumService {
     private ForumRepository forumRepository;
 
     public String getForumDetails() {
-        // Implementar a lógica de negócio aqui
+        // Implementar a logica de negocio aqui
         return "Detalhes do fórum";
     }
 }
