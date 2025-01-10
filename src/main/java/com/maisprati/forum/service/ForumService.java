@@ -1,9 +1,9 @@
 package com.maisprati.forum.service;
 
+import com.maisprati.forum.dto.ForumDto;
+import com.maisprati.forum.repository.ForumRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.maisprati.forum.repository.ForumRepository;
-import com.maisprati.forum.model.Forum;
 
 @Service
 public class ForumService {
@@ -11,8 +11,12 @@ public class ForumService {
     @Autowired
     private ForumRepository forumRepository;
 
-    public String getForumDetails() {
-        // Implementar a logica de negocio aqui
-        return "Detalhes do fórum";
+    public ForumDto getForumDetails() {
+        // Implementar a logica de negocio para obter os detalhes do forum
+        ForumDto forumDto = new ForumDto();
+        forumDto.setId(1L);
+        forumDto.setName("Forum Example");
+        forumDto.setDescription("Description of the forum");
+        return forumDto;
     }
 }

@@ -1,13 +1,13 @@
 package com.maisprati.forum.controller;
 
-import com.maisprati.forum.model.Topic;
-import com.maisprati.forum.model.Response;
+import com.maisprati.forum.dto.TopicDto;
 import com.maisprati.forum.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/topics")
@@ -17,23 +17,21 @@ public class TopicController {
     private TopicService topicService;
 
     @PostMapping
-    public ResponseEntity<Topic> createTopic(@RequestBody Topic topic) {
-        return ResponseEntity.ok(topicService.createTopic(topic));
+    public ResponseEntity<TopicDto> createTopic(@RequestBody TopicDto topicDto) {
+        TopicDto createdTopicDto = topicService.createTopic(topicDto);
+        return ResponseEntity.ok(createdTopicDto);
     }
 
     @GetMapping
-    public ResponseEntity<List<Topic>> getAllTopics() {
-        return ResponseEntity.ok(topicService.getAllTopics());
-    }
-
-    @PostMapping("/{id}/responses")
-    public ResponseEntity<?> addResponse(@PathVariable Long id, @RequestBody Response response) {
-        return topicService.addResponse(id, response);
+    public ResponseEntity<List<TopicDto>> getAllTopics() {
+        List<TopicDto> topicDtos = topicService.getAllTopics();
+        return ResponseEntity.ok(topicDtos);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Topic> updateTopic(@PathVariable Long id, @RequestBody Topic topic) {
-        return ResponseEntity.ok(topicService.updateTopic(id, topic));
+    public ResponseEntity<TopicDto> updateTopic(@PathVariable Long id, @RequestBody TopicDto topicDto) {
+        TopicDto updatedTopicDto = topicService.updateTopic(id, topicDto);
+        return ResponseEntity.ok(updatedTopicDto);
     }
 
     @DeleteMapping("/{id}")

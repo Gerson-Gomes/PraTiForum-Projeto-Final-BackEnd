@@ -1,5 +1,6 @@
 package com.maisprati.forum.service;
 
+import com.maisprati.forum.dto.UserDto;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,11 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.ok("Usuário registrado com sucesso!");
     }
 
-    public ResponseEntity<?> loginUser(User user) {
-        // Autenticação do usuário e geração de token JWT
+    public ResponseEntity<?> authenticateUser(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
         return ResponseEntity.ok("Usuário autenticado com sucesso!");
     }
 
@@ -46,7 +50,7 @@ public class UserService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword())
-                .authorities(new ArrayList<>()) // Aqui você pode adicionar as autorizações do usuário
+                .authorities(new ArrayList<>()) // Aqui  podemos adicionar as autorizaçoes do usuario
                 .build();
     }
 }
