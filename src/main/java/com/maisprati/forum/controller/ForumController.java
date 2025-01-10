@@ -1,9 +1,10 @@
 package com.maisprati.forum.controller;
 
+import com.maisprati.forum.dto.ForumDto;
+import com.maisprati.forum.service.ForumService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.maisprati.forum.service.ForumService;
 
 @RestController
 public class ForumController {
@@ -12,7 +13,7 @@ public class ForumController {
     private ForumService forumService;
 
     @GetMapping("/forum")
-    public String getForum() {
+    public ForumDto getForum() {
         return forumService.getForumDetails();
     }
 }

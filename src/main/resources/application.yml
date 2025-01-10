@@ -1,3 +1,18 @@
+# Configuração comum para todos os perfis
 spring:
-  profiles:
-    active: prod
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    url: jdbc:h2:mem:testdb # Banco de dados em memória H2 para desenvolvimento
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.dialect: org.hibernate.dialect.H2Dialect
+    show-sql: true
+
+jwt:
+  secret: nicolau\#12
