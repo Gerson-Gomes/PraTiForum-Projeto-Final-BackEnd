@@ -1,0 +1,22 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+  application:
+    name: maispratiforum
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/${DATA_BASE}
+    username: ${USER}
+    password: ${PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show-sql: true
+jwt:
+  secret: ${SECRET_JWT}
