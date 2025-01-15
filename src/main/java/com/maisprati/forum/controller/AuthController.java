@@ -1,7 +1,7 @@
 package com.maisprati.forum.controller;
 
+import com.maisprati.forum.dto.LoginDto;
 import com.maisprati.forum.dto.UserDto;
-import com.maisprati.forum.model.User;
 import com.maisprati.forum.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,18 +16,12 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserDto userDto) {
-        User user = new User();
-        user.setUserName(userDto.getUserName());  // Corrigido para usar getUserName()
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setEmail(userDto.getEmail());
-        user.setPassword(userDto.getPassword());
-        return userService.registerUser(user);
+        return userService.registerUser(userDto);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody UserDto userDto) {
-        return userService.authenticateUser(userDto.getEmail(), userDto.getPassword());
+    public ResponseEntity<?> loginUser(@RequestBody LoginDto loginDto) {
+        return userService.authenticateUser(loginDto.getEmail(), loginDto.getPassword());
     }
 
     @PostMapping("/forgot-password")
