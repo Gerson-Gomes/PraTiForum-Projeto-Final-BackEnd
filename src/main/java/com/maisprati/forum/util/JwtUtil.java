@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.Map;
 import java.util.function.Function;
 
 
@@ -61,7 +62,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(username) // Define o "subject" (nome do usuário)
                 .setIssuedAt(new Date()) // Data de emissão
-                .setExpiration(generateExpirationDate()) // Data de expiração
+                .setExpiration(generateExpirationDate())
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256) // Assina o token
                 .compact();
     }
@@ -97,4 +98,5 @@ public class JwtUtil {
     private long calculateExpirationInMillis() {
         return 1000 * 60 * 20; // 20 minutos em milissegundos
     }
+
 }
