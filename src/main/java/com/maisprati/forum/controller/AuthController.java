@@ -39,7 +39,7 @@ public class AuthController {
         var auth = this.authenticationManager.authenticate(userAuth);
 
         User user = (User) auth.getPrincipal();
-        var token = jwtUtil.generateToken(user);
+        var token = jwtUtil.generateToken(user.getEmail());
 
         return ResponseEntity.ok().body(new LoginResponseDto(token));
     }

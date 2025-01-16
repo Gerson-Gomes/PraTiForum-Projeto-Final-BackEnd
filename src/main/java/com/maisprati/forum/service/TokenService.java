@@ -13,6 +13,6 @@ public class TokenService {
     private JwtUtil jwtUtil;
 
     public String generateTokenForUser(User user) {
-        return jwtUtil.generateToken(user);
+        return jwtUtil.generateToken(user.getEmail());
     }
 }
