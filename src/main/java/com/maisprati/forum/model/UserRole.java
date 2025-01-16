@@ -1,8 +1,8 @@
 package com.maisprati.forum.model;
 
 public enum UserRole {
-    ADMIN("admin"),
-    USER("user");
+    ADMIN("ADMIN"),
+    USER("USER");
 
     private String role;
 
