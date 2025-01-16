@@ -1,19 +1,13 @@
 package com.maisprati.forum.service;
 
 
-import com.maisprati.forum.dto.LoginDto;
-import com.maisprati.forum.dto.LoginResponseDto;
 import com.maisprati.forum.dto.UserRegisterDto;
 import com.maisprati.forum.dto.UserRegisterResponseDto;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.repository.UserRepository;
 import com.maisprati.forum.util.JwtUtil;
-import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -39,12 +33,13 @@ public class UserService implements UserDetailsService {
         if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
             return null;
         }
-        if ( userRepository.findByEmail(userDto.getEmail()) != null ) {
+        if ( userRepository.findByUserName(userDto.getEmail()) != null ) {
             return null;
         }
 
         User user = new User();
         user.setEmail(userDto.getEmail());
+        user.setUserName(userDto.getEmail());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setFirstName(userDto.getFullName());
         var userSaved = userRepository.save(user);
@@ -62,7 +57,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var user = userRepository.findByEmail(username);
+        var user = userRepository.findByUserName(username);
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }

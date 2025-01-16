@@ -41,7 +41,9 @@ public class AuthController {
         User user = (User) auth.getPrincipal();
         var token = jwtUtil.generateToken(user.getEmail());
 
-        return ResponseEntity.ok().body(new LoginResponseDto(token));
+        return ResponseEntity.ok().body(new LoginResponseDto(
+                token,
+                user.getRole()));
     }
 
     @PostMapping("/forgot-password")
