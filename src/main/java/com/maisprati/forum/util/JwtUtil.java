@@ -1,13 +1,12 @@
 package com.maisprati.forum.util;
 
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.SignatureVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.maisprati.forum.model.User;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -18,15 +17,16 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
+    // Gera uma chave de assinatura com o segredo
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
     /**
      * Extrai o username (subject) de um token JWT.
      */
     public String extractUsername(String token) {
-        try {
-            return extractClaim(token, Claims::getSubject);
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao extrair o nome de usuário do token", e);
-        }
+        return extractClaim(token, Claims::getSubject);
     }
 
     /**
@@ -40,69 +40,51 @@ public class JwtUtil {
     /**
      * Extrai todos os claims de um token JWT.
      */
-    public Claims extractAllClaims(String token) {
+    private Claims extractAllClaims(String token) {
         try {
-            return Jwts.parser()
-                    .setSigningKey(secret)
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
                     .parseClaimsJws(token)
                     .getBody();
+        } catch (ExpiredJwtException e) {
+            throw new RuntimeException("Token expirado.", e);
         } catch (JwtException | IllegalArgumentException e) {
-            throw new RuntimeException("Token inválido ou expirado", e);
+            throw new RuntimeException("Token inválido ou malformado.", e);
         }
     }
 
     /**
-     * Valida um token JWT contra as credenciais do usuário.
+     * Gera um token JWT para um usuário.
      */
-    public String generateToken(User user) {
-        Algorithm algorithm = Algorithm.HMAC256(secret);
-
-        return com.auth0.jwt.JWT.create()
-                .withSubject(user.getUsername()) // Define o "subject" (usuário)
-                .withIssuedAt(new Date()) // Define a data de emissão
-                .withExpiresAt(generateExpirationDate()) // Define a data de expiração
-                .sign(algorithm); // Assina o token com o algoritmo e a chave secreta
+    public String generateToken(String username) {
+        return Jwts.builder()
+                .setSubject(username) // Define o "subject" (nome do usuário)
+                .setIssuedAt(new Date()) // Data de emissão
+                .setExpiration(generateExpirationDate()) // Data de expiração
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256) // Assina o token
+                .compact();
     }
 
-    public String validateToken(String token) {
-        try {
-            // Verifica a assinatura e decodifica o token
-            DecodedJWT decodedJWT = com.auth0.jwt.JWT.require(
-                    Algorithm.HMAC256(secret)) // Algoritmo com chave secreta
-                    .build()
-                    .verify(token); // Verifica o token
-
-            // Verifica se o token não está expirado
-            Date expirationDate = decodedJWT.getExpiresAt();
-            if (expirationDate.before(new Date())) {
-                System.out.println("Token expirado.");
-                return null;
-            }
-
-            return decodedJWT.getSubject(); // Token válido
-
-        } catch (ExpiredJwtException e) {
-            System.out.println("Token expirado.");
-        } catch (SignatureVerificationException e) {
-            System.out.println("Assinatura do token inválida.");
-        } catch (Exception e) {
-            System.out.println("Erro ao validar o token: " + e.getMessage());
-        }
-        return null;
+    /**
+     * Valida o token JWT.
+     */
+    public boolean validateToken(String token, String username) {
+        final String extractedUsername = extractUsername(token);
+        return extractedUsername.equals(username) && !isTokenExpired(token);
     }
-
 
     /**
      * Verifica se o token está expirado.
      */
-    public Boolean isTokenExpired(String token) {
+    private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
     /**
      * Extrai a data de expiração do token.
      */
-    public Date extractExpiration(String token) {
+    private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
