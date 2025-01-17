@@ -4,9 +4,8 @@ import com.maisprati.forum.dto.LoginDto;
 import com.maisprati.forum.dto.LoginResponseDto;
 import com.maisprati.forum.dto.UserRegisterDto;
 import com.maisprati.forum.model.User;
-import com.maisprati.forum.service.TokenService;
 import com.maisprati.forum.service.UserService;
-import com.maisprati.forum.util.JwtUtil;
+import com.maisprati.forum.service.token.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private TokenService tokenService;
 
     @Autowired
     private UserService userService;
@@ -39,7 +38,7 @@ public class AuthController {
         var auth = this.authenticationManager.authenticate(userAuth);
 
         User user = (User) auth.getPrincipal();
-        var token = jwtUtil.generateToken(user.getEmail());
+        var token = tokenService.generateToken(user.getUsername());
 
         return ResponseEntity.ok().body(new LoginResponseDto(
                 token,

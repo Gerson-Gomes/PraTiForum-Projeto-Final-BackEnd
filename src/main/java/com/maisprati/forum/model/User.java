@@ -2,10 +2,7 @@ package com.maisprati.forum.model;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -23,6 +20,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @Builder
+@ToString
 public class User implements UserDetails {
 
     @Id
@@ -124,6 +122,7 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
+
 }
 
 

@@ -1,15 +1,12 @@
 package com.maisprati.forum.config;
 
-import com.maisprati.forum.repository.UserRepository;
-import com.maisprati.forum.service.TokenService;
 import com.maisprati.forum.service.UserService;
-import com.maisprati.forum.util.JwtUtil;
+import com.maisprati.forum.service.token.TokenService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -23,11 +20,11 @@ import java.io.IOException;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final UserService userService;
-    private final JwtUtil jwtUtil;
+    private final TokenService tokenService;
 
-    public JwtRequestFilter(@Lazy UserService userService, JwtUtil jwtUtil) {
+    public JwtRequestFilter(@Lazy UserService userService, TokenService tokenService) {
         this.userService = userService;
-        this.jwtUtil = jwtUtil;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -62,7 +59,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
 
     private void authenticateUser(String token) {
-        String username = jwtUtil.extractUsername(token);
+        String username = tokenService.extractUsername(token);
         UserDetails userDetails = userService.loadUserByUsername(username);
 
         if (userDetails == null) {
