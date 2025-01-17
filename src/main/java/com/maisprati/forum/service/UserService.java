@@ -5,7 +5,7 @@ import com.maisprati.forum.dto.UserRegisterDto;
 import com.maisprati.forum.dto.UserRegisterResponseDto;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.repository.UserRepository;
-import com.maisprati.forum.util.JwtUtil;
+import com.maisprati.forum.service.token.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,7 +25,7 @@ public class UserService implements UserDetailsService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private TokenService tokenService;
 
 
 
@@ -45,7 +45,6 @@ public class UserService implements UserDetailsService {
         var userSaved = userRepository.save(user);
 
         return new UserRegisterResponseDto(userSaved);
-
     }
 
 
@@ -59,7 +58,7 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         var user = userRepository.findByUserName(username);
         if (user == null) {
-            throw new UsernameNotFoundException("User not found");
+            throw new UsernameNotFoundException("Usuário não encontrado.");
         }
         return user;
     }

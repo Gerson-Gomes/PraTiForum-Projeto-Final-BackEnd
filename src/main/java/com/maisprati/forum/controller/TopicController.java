@@ -1,9 +1,11 @@
 package com.maisprati.forum.controller;
 
 import com.maisprati.forum.dto.TopicDto;
+import com.maisprati.forum.model.User;
 import com.maisprati.forum.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +27,7 @@ public class TopicController {
     @GetMapping
     public ResponseEntity<List<TopicDto>> getAllTopics() {
         List<TopicDto> topicDtos = topicService.getAllTopics();
+
         return ResponseEntity.ok(topicDtos);
     }
 
