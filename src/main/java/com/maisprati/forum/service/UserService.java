@@ -1,8 +1,11 @@
 package com.maisprati.forum.service;
 
-import com.maisprati.forum.dto.UserDto;
+
+import com.maisprati.forum.dto.UserRegisterDto;
+import com.maisprati.forum.dto.UserRegisterResponseDto;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.repository.UserRepository;
+import com.maisprati.forum.service.token.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -22,28 +24,30 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<?> registerUser(UserDto userDto) {
+    @Autowired
+    private TokenService tokenService;
+
+
+
+    public UserRegisterResponseDto registerUser(UserRegisterDto userDto) {
         if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
-            return ResponseEntity.badRequest().body("Passwords do not match");
+            return null;
+        }
+        if ( userRepository.findByUserName(userDto.getEmail()) != null ) {
+            return null;
         }
 
         User user = new User();
-        user.setUserName(userDto.getUserName());
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
         user.setEmail(userDto.getEmail());
+        user.setUserName(userDto.getEmail());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        userRepository.save(user);
-        return ResponseEntity.ok("Usuário registrado com sucesso!");
+        user.setFirstName(userDto.getFullName());
+        var userSaved = userRepository.save(user);
+
+        return new UserRegisterResponseDto(userSaved);
     }
 
-    public ResponseEntity<?> authenticateUser(String email, String password) {
-        User user = userRepository.findByEmail(email);
-        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-            return ResponseEntity.status(401).body("Invalid credentials");
-        }
-        return ResponseEntity.ok("Usuário autenticado com sucesso!");
-    }
+
 
     public ResponseEntity<?> forgotPassword(String email) {
         // Lógica para recuperação de senha
@@ -52,14 +56,10 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
+        var user = userRepository.findByUserName(username);
         if (user == null) {
-            throw new UsernameNotFoundException("User not found");
+            throw new UsernameNotFoundException("Usuário não encontrado.");
         }
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getEmail())
-                .password(user.getPassword())
-                .authorities(new ArrayList<>()) // Aqui  podemos adicionar as autorizaçoes do usuario
-                .build();
+        return user;
     }
 }
