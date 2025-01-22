@@ -1,7 +1,6 @@
 package com.maisprati.forum.service;
 
 import com.maisprati.forum.dto.TopicDto;
-import com.maisprati.forum.model.Like;
 import com.maisprati.forum.model.Topic;
 import com.maisprati.forum.model.Response;
 import com.maisprati.forum.repository.TopicRepository;
