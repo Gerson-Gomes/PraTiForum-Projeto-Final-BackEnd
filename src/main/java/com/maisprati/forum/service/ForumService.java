@@ -1,6 +1,6 @@
 package com.maisprati.forum.service;
 
-import com.maisprati.forum.dto.ForumDto;
+import com.maisprati.forum.dto.request.ForumDto;
 import com.maisprati.forum.repository.ForumRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -33,6 +33,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
                         .requestMatchers("/api/topics").hasRole("USER")
+                        .requestMatchers("/api/user/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
@@ -55,7 +56,7 @@ public class WebSecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-    };
+    }
 
 
     private static final String[] AUTH_WHITELIST = {
