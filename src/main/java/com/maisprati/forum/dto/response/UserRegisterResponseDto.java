@@ -1,4 +1,4 @@
-package com.maisprati.forum.dto;
+package com.maisprati.forum.dto.response;
 
 import com.maisprati.forum.model.User;
 import lombok.Data;

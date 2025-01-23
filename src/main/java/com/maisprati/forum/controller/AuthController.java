@@ -1,8 +1,8 @@
 package com.maisprati.forum.controller;
 
-import com.maisprati.forum.dto.LoginDto;
-import com.maisprati.forum.dto.LoginResponseDto;
-import com.maisprati.forum.dto.UserRegisterDto;
+import com.maisprati.forum.dto.request.LoginDto;
+import com.maisprati.forum.dto.response.LoginResponseDto;
+import com.maisprati.forum.dto.request.UserRegisterDto;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.service.UserService;
 import com.maisprati.forum.service.token.TokenService;
@@ -45,8 +45,8 @@ public class AuthController {
                 user.getRole()));
     }
 
-    @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody String email) {
-        return userService.forgotPassword(email);
-    }
+//    @PostMapping("/forgot-password")
+//    public ResponseEntity<?> forgotPassword(@RequestBody String email) {
+//        return userService.forgotPassword(email);
+//    }
 }

@@ -1,4 +1,4 @@
-package com.maisprati.forum.dto;
+package com.maisprati.forum.dto.request;
 
 
 import lombok.Data;
