@@ -16,12 +16,14 @@ public class TagService {
     private TagRepository tagRepository;
 
     public TagDto createTag(TagDto tagDto) {
+        if(tagDto.getName().equals(tagRepository.findTagByName(tagDto.getName()))){
+            throw new IllegalArgumentException("Já existe uma tag com o nome fornecido.");
+        }
         Tag tag = new Tag();
         tag.setName(tagDto.getName());
         Tag createdTag = tagRepository.save(tag);
 
         TagDto createdTagDto = new TagDto();
-        createdTagDto.setId(createdTag.getId());
         createdTagDto.setName(createdTag.getName());
         return createdTagDto;
     }
@@ -29,7 +31,6 @@ public class TagService {
     public List<TagDto> getAllTags() {
         return tagRepository.findAll().stream().map(tag -> {
             TagDto tagDto = new TagDto();
-            tagDto.setId(tag.getId());
             tagDto.setName(tag.getName());
             return tagDto;
         }).collect(Collectors.toList());
@@ -41,9 +42,15 @@ public class TagService {
         Tag updatedTag = tagRepository.save(existingTag);
 
         TagDto updatedTagDto = new TagDto();
-        updatedTagDto.setId(updatedTag.getId());
         updatedTagDto.setName(updatedTag.getName());
         return updatedTagDto;
+    }
+    public TagDto getTagByName(String name) {
+        Tag tag = tagRepository.findTagByName(name)
+                .orElseThrow(() -> new RuntimeException("Tag não encontrada com o nome: " + name));
+        TagDto tagDto = new TagDto();
+        tagDto.setName(tag.getName());
+        return tagDto;
     }
 
     public void deleteTag(Long id) {
