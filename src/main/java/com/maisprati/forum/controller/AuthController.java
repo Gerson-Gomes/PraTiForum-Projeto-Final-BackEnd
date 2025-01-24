@@ -1,6 +1,6 @@
 package com.maisprati.forum.controller;
 
-import com.maisprati.forum.dto.request.LoginDto;
+import com.maisprati.forum.dto.request.LoginRegisterDto;
 import com.maisprati.forum.dto.response.LoginResponseDto;
 import com.maisprati.forum.dto.request.UserRegisterDto;
 import com.maisprati.forum.model.User;
@@ -33,7 +33,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<?> loginUser(@RequestBody LoginRegisterDto loginDto) {
         var userAuth = new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
         var auth = this.authenticationManager.authenticate(userAuth);
 
