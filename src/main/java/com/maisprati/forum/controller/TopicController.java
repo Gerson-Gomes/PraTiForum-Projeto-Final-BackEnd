@@ -31,6 +31,13 @@ public class TopicController {
         return ResponseEntity.ok(topicDtos);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Topic> getTopicById(@PathVariable Long id) {
+        Topic topicDtos = topicService.getTopicById(id);
+
+        return ResponseEntity.ok(topicDtos);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<TopicDto> updateTopic(@PathVariable Long id, @RequestBody TopicDto topicDto) {
         TopicDto updatedTopicDto = topicService.updateTopic(id, topicDto);

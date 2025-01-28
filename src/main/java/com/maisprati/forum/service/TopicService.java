@@ -63,6 +63,14 @@ public class TopicService {
         return topicRepository.save(topic);
     }
 
+    public Topic getTopicById(Long id){
+        Topic topic = topicRepository.findById(id)
+                .orElseThrow(() -> {
+                    return new EntityNotFoundException("Tópico não encontrado com id: " + id);
+                });
+        return topic;
+    }
+
     public List<TopicDto> getAllTopics() {
         return topicRepository.findAll().stream().map(topic -> {
             TopicDto topicDto = new TopicDto();
