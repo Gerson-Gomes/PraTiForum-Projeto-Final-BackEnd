@@ -8,6 +8,7 @@ import com.maisprati.forum.dto.response.UserProfileResponseDto;
 import com.maisprati.forum.dto.response.UserRegisterResponseDto;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.model.UserSocialMidia;
+import com.maisprati.forum.repository.TopicRepository;
 import com.maisprati.forum.repository.UserRepository;
 import com.maisprati.forum.repository.UserSocialMidiaRepository;
 import com.maisprati.forum.service.token.TokenService;
@@ -21,9 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -31,6 +30,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TopicRepository topicRepository;
 
     @Autowired
     private UserSocialMidiaRepository userSocialMidiaRepository;
@@ -178,7 +180,5 @@ public class UserService implements UserDetailsService {
 
         return new UserRegisterResponseDto(userSaved);
     }
-
-
 
 }
