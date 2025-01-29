@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -179,6 +180,8 @@ public class UserService implements UserDetailsService {
         return new UserRegisterResponseDto(userSaved);
     }
 
-
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id); // delega para o repositório JPA
+    }
 
 }
