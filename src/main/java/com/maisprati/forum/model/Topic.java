@@ -52,10 +52,9 @@ public class Topic {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tag> tags;
-
     @ManyToMany
     @JoinTable(
-            name = "users_favorites",
+            name = "users_favorites_topics",
             joinColumns = @JoinColumn(name = "topics_id"),
             inverseJoinColumns = @JoinColumn(name = "users_id")
     )
