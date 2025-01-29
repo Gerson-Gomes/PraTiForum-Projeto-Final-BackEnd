@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -179,6 +181,10 @@ public class UserService implements UserDetailsService {
         var userSaved = userRepository.save(user);
 
         return new UserRegisterResponseDto(userSaved);
+    }
+
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id); // delega para o repositório JPA
     }
 
 }
