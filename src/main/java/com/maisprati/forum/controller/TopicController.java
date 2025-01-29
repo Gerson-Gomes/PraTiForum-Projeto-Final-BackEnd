@@ -2,8 +2,10 @@ package com.maisprati.forum.controller;
 
 import com.maisprati.forum.dto.request.TopicDto;
 import com.maisprati.forum.dto.request.TopicRegisterDto;
+import com.maisprati.forum.dto.response.FavoriteTopicResponseDto;
 import com.maisprati.forum.model.Topic;
 import com.maisprati.forum.service.TopicService;
+import com.maisprati.forum.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ public class TopicController {
 
     @Autowired
     private TopicService topicService;
+    @Autowired
+    private UserService userService;
 
     @PostMapping
     public ResponseEntity<Topic> createTopic(@RequestBody TopicRegisterDto topicDto,  HttpServletRequest request) {
@@ -42,6 +46,18 @@ public class TopicController {
     public ResponseEntity<TopicDto> updateTopic(@PathVariable Long id, @RequestBody TopicDto topicDto) {
         TopicDto updatedTopicDto = topicService.updateTopic(id, topicDto);
         return ResponseEntity.ok(updatedTopicDto);
+    }
+
+    @PostMapping("/{id}/favorite")
+    public ResponseEntity<FavoriteTopicResponseDto> favoriteTopicById(@PathVariable Long id, HttpServletRequest httpServletRequest){
+        var favoriteTopicDto = topicService.favoriteTopic(id, httpServletRequest);
+        return ResponseEntity.ok(favoriteTopicDto);
+    }
+
+    @PostMapping("/{id}/unfavorite")
+    public ResponseEntity<FavoriteTopicResponseDto> unfavoriteTopicById(@PathVariable Long id, HttpServletRequest httpServletRequest) {
+        var favoriteTopicDto = topicService.unfavoriteTopic(id, httpServletRequest);
+        return ResponseEntity.ok(favoriteTopicDto);
     }
 
     @DeleteMapping("/{id}")

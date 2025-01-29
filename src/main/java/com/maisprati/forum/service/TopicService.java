@@ -3,6 +3,7 @@ package com.maisprati.forum.service;
 
 import com.maisprati.forum.dto.request.TopicDto;
 import com.maisprati.forum.dto.request.TopicRegisterDto;
+import com.maisprati.forum.dto.response.FavoriteTopicResponseDto;
 import com.maisprati.forum.model.Topic;
 import com.maisprati.forum.model.Response;
 import com.maisprati.forum.model.Tag;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.ErrorResponseException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -130,5 +132,36 @@ public class TopicService {
             topicRepository.deleteById(topicId);
         }
         ResponseEntity.noContent().build();
+    }
+
+    public FavoriteTopicResponseDto favoriteTopic(Long id, HttpServletRequest request){
+        String token = request.getHeader("Authorization").substring(7);
+        String username = tokenService.extractUsername(token);
+        User user = userRepository.findByUserName(username);
+
+        Topic topic = topicRepository.findById(id) .orElseThrow(
+                () -> new EntityNotFoundException("Topic not found with id " + id));
+        List<User> topicUserFavorite = topic.getUsersWhoFavorited();
+        topicUserFavorite.add(user);
+        topic.setUsersWhoFavorited(topicUserFavorite);
+        topicRepository.save(topic);
+
+        return new FavoriteTopicResponseDto(id,user.getId());
+    }
+
+    public FavoriteTopicResponseDto unfavoriteTopic(Long id, HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+        String username = tokenService.extractUsername(token);
+        User user = userRepository.findByUserName(username);
+
+        Topic topic = topicRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Topic not found with id " + id));
+
+        List<User> topicUserFavorite = topic.getUsersWhoFavorited();
+        topicUserFavorite.remove(user);
+        topic.setUsersWhoFavorited(topicUserFavorite);
+        topicRepository.save(topic);
+
+        return new FavoriteTopicResponseDto(id, user.getId());
     }
 }
