@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
@@ -20,8 +20,8 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserProfileResponseDto>> getAllUsers() {
-        List<UserProfileResponseDto> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+        var users = userService.getAllUsers();
+        return ResponseEntity.ok().body(users);
     }
 
     @GetMapping("/{id}")

@@ -8,7 +8,6 @@ import com.maisprati.forum.dto.response.UserProfileResponseDto;
 import com.maisprati.forum.dto.response.UserRegisterResponseDto;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.model.UserSocialMidia;
-import com.maisprati.forum.repository.TopicRepository;
 import com.maisprati.forum.repository.UserRepository;
 import com.maisprati.forum.repository.UserSocialMidiaRepository;
 import com.maisprati.forum.service.token.TokenService;
@@ -47,9 +46,8 @@ public class UserService implements UserDetailsService {
         String token = request.getHeader("Authorization").substring(7);
         String username = tokenService.extractUsername(token);
 
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
-        User userToken = userRepository.findByUserName(username);
+        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+        User userToken = userRepository.findByUserName(username).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));;
 
         if (!id.equals(userToken.getId())) {
             throw new SecurityException("Você só pode editar o seu próprio perfil.");
@@ -65,14 +63,15 @@ public class UserService implements UserDetailsService {
         user.setLastEditionDate(LocalDateTime.now());
 
         // Atualizar ou adicionar redes sociais
-        if (userUpdateDto.getSocialMedia() != null) {
+        if (!userUpdateDto.getSocialMedia().isEmpty()) {
             updateSocialMedia(user, userUpdateDto.getSocialMedia());
         }
 
-        userRepository.save(user);
-        return new UserProfileResponseDto(user);
+
+        return new UserProfileResponseDto(userRepository.save(user));
     }
 
+    //BUG ENCONTRADO QUANDO USUÁRIO É ATUALIZADO.
     private void updateSocialMedia(User user, List<SocialMediaDto> socialMediaDtos) {
         List<UserSocialMidia> existingSocialMedia = user.getUserSocialMidia();
 
@@ -127,7 +126,8 @@ public class UserService implements UserDetailsService {
         String username = tokenService.extractUsername(token);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
-        User userToken = userRepository.findByUserName(username);
+        User userToken = userRepository.findByUserName(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));;
 
         if (!id.equals(userToken.getId())) {
             throw new SecurityException("Você só pode deletar o seu próprio perfil.");
@@ -143,39 +143,31 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public UserProfileResponseDto getUserById(Long id) {
-        var user = userRepository.findById(id);
         return userRepository.findById(id)
                 .map(UserProfileResponseDto::new).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado") );
     }
 
     public UserProfileResponseDto getUserByUsername(String username) {
-        User user = userRepository.findByUserName(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("Usuário não encontrado.");
-        }
-        return new UserProfileResponseDto(user);
+        return userRepository.findByUserName(username)
+                .map(UserProfileResponseDto::new)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var user = userRepository.findByUserName(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("Usuário não encontrado.");
-        }
-        return user;
+        return userRepository.findByUserName(username).orElseThrow(() ->
+                new UsernameNotFoundException("Usuário não encontrado"));
     }
+
     public UserRegisterResponseDto registerUser(UserRegisterDto userDto) {
         if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
             throw new RuntimeException("Senhas não correspondem.") ;
         }
-        if ( userRepository.findByUserName(userDto.getEmail()) != null ) {
+        if (userRepository.findByUserName(userDto.getEmail()).isPresent()) {
             throw new RuntimeException("Usuario inválido.");
         }
 
-
-        var userSaved = userRepository.save(userDto.createUser(userDto, passwordEncoder));
-
-        return new UserRegisterResponseDto(userSaved);
+        return new UserRegisterResponseDto(userRepository.save(userDto.createUser(userDto, passwordEncoder)));
     }
 
     public Optional<User> findById(Long id) {
