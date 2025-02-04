@@ -35,8 +35,8 @@ public class UserController {
             @PathVariable Long id,
             @RequestBody UserUpdateDto userUpdateDto,
             HttpServletRequest request) {
-        UserProfileResponseDto response = userService.editUser(id, userUpdateDto, request);
-        return ResponseEntity.ok(response);
+        var user = userService.editUser(id, userUpdateDto, request);
+        return ResponseEntity.ok().body(user);
     }
 
     @DeleteMapping("/{id}")
@@ -47,7 +47,7 @@ public class UserController {
 
     @GetMapping("/username/{username}")
     public ResponseEntity<UserProfileResponseDto> getUserByUsername(@PathVariable String username) {
-        UserProfileResponseDto user = userService.getUserByUsername(username);
-        return ResponseEntity.ok(user);
+        var user = userService.getUserByUsername(username);
+        return ResponseEntity.ok().body(user);
     }
 }
