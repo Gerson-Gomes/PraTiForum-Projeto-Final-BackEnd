@@ -20,6 +20,7 @@ public class UserProfileResponseDto {
     private LocalDateTime creationDate;
     private LocalDateTime lastEditionDate;
     private List<SocialMediaDto> socialMedia;
+    private byte[] profilePicture;
 
     public UserProfileResponseDto(User user) {
         this.id = user.getId();
@@ -30,6 +31,7 @@ public class UserProfileResponseDto {
         this.birthDate = user.getBirthDate();
         this.creationDate = user.getCreationDate();
         this.lastEditionDate = user.getLastEditionDate();
+        this.profilePicture = user.getProfilePicture();
 
         if (user.getUserSocialMidia() != null) {
             this.socialMedia = user.getUserSocialMidia().stream()
@@ -44,6 +46,4 @@ public class UserProfileResponseDto {
                     .collect(Collectors.toList());
         }
     }
-
-
 }

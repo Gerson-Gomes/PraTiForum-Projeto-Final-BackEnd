@@ -14,6 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.ErrorResponseException;
 
@@ -46,7 +47,7 @@ public class TopicService {
 
     public Topic createTopic(TopicRegisterDto topicDto, HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);
-        User user = userRepository.findByUserName(tokenService.extractUsername(token));
+        User user = userRepository.findByUserName(tokenService.extractUsername(token)).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
         Optional<Tag> tag = tagRepository.findById(topicDto.getTadId());
         List<Tag> listTag = new ArrayList<>();
@@ -137,7 +138,7 @@ public class TopicService {
     public FavoriteTopicResponseDto favoriteTopic(Long id, HttpServletRequest request){
         String token = request.getHeader("Authorization").substring(7);
         String username = tokenService.extractUsername(token);
-        User user = userRepository.findByUserName(username);
+        User user = userRepository.findByUserName(username).orElseThrow();
 
         Topic topic = topicRepository.findById(id) .orElseThrow(
                 () -> new EntityNotFoundException("Topic not found with id " + id));
@@ -152,7 +153,7 @@ public class TopicService {
     public FavoriteTopicResponseDto unfavoriteTopic(Long id, HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);
         String username = tokenService.extractUsername(token);
-        User user = userRepository.findByUserName(username);
+        User user = userRepository.findByUserName(username).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
         Topic topic = topicRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Topic not found with id " + id));

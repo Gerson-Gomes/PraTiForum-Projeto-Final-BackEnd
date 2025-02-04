@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
@@ -20,14 +20,14 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserProfileResponseDto>> getAllUsers() {
-        List<UserProfileResponseDto> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+        var users = userService.getAllUsers();
+        return ResponseEntity.ok().body(users);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserProfileResponseDto> getUserById(@PathVariable Long id) {
-        UserProfileResponseDto user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
+        var user = userService.getUserById(id);
+        return ResponseEntity.ok().body(user);
     }
 
     @PutMapping("/{id}")
@@ -35,8 +35,8 @@ public class UserController {
             @PathVariable Long id,
             @RequestBody UserUpdateDto userUpdateDto,
             HttpServletRequest request) {
-        UserProfileResponseDto response = userService.editUser(id, userUpdateDto, request);
-        return ResponseEntity.ok(response);
+        var user = userService.editUser(id, userUpdateDto, request);
+        return ResponseEntity.ok().body(user);
     }
 
     @DeleteMapping("/{id}")
@@ -47,7 +47,7 @@ public class UserController {
 
     @GetMapping("/username/{username}")
     public ResponseEntity<UserProfileResponseDto> getUserByUsername(@PathVariable String username) {
-        UserProfileResponseDto user = userService.getUserByUsername(username);
-        return ResponseEntity.ok(user);
+        var user = userService.getUserByUsername(username);
+        return ResponseEntity.ok().body(user);
     }
 }
