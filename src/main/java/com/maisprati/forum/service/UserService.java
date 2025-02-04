@@ -13,6 +13,7 @@ import com.maisprati.forum.repository.UserRepository;
 import com.maisprati.forum.repository.UserSocialMidiaRepository;
 import com.maisprati.forum.service.token.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,7 +25,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -32,9 +32,6 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private TopicRepository topicRepository;
 
     @Autowired
     private UserSocialMidiaRepository userSocialMidiaRepository;
@@ -45,6 +42,7 @@ public class UserService implements UserDetailsService {
     @Autowired
     private TokenService tokenService;
 
+    @Transactional
     public UserProfileResponseDto editUser(Long id, UserUpdateDto userUpdateDto, HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);
         String username = tokenService.extractUsername(token);
@@ -143,10 +141,11 @@ public class UserService implements UserDetailsService {
         return users.stream().map(UserProfileResponseDto::new).toList();
     }
 
+    @Transactional
     public UserProfileResponseDto getUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
-        return new UserProfileResponseDto(user);
+        var user = userRepository.findById(id);
+        return userRepository.findById(id)
+                .map(UserProfileResponseDto::new).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado") );
     }
 
     public UserProfileResponseDto getUserByUsername(String username) {
@@ -173,12 +172,8 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException("Usuario inválido.");
         }
 
-        User user = new User();
-        user.setEmail(userDto.getEmail());
-        user.setUserName(userDto.getEmail());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setFirstName(userDto.getFullName());
-        var userSaved = userRepository.save(user);
+
+        var userSaved = userRepository.save(userDto.createUser(userDto, passwordEncoder));
 
         return new UserRegisterResponseDto(userSaved);
     }
