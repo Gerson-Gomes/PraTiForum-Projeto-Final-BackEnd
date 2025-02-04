@@ -20,7 +20,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @Builder
-@ToString
 public class User implements UserDetails {
 
     @Id
@@ -70,18 +69,23 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Topic> topics;
 
-    @OneToMany(mappedBy = "user")
+    @ToString.Exclude
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSocialMidia> userSocialMidia;
 
+    @ToString.Exclude
     @ManyToMany(mappedBy = "usersWhoFavorited")
     private List<Topic> favoritedTopics;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Response> responses;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
 

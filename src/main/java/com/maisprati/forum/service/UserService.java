@@ -128,7 +128,7 @@ public class UserService implements UserDetailsService {
 
 
     private static void verifyToken(String token) {
-        if (token == null || !token.startsWith("Bearer ")) {
+        if (token == null) {
             throw new SecurityException("Token inválido.");
         }
     }
