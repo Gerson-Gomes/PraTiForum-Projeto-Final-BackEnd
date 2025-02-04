@@ -73,6 +73,7 @@ public class UserService implements UserDetailsService {
         return new UserProfileResponseDto(userRepository.save(user));
     }
 
+    @Transactional
     public void deleteUser(Long id, HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);
         verifyToken(token);
@@ -89,21 +90,26 @@ public class UserService implements UserDetailsService {
         userRepository.delete(user);
     }
 
+    @Transactional
     public List<UserProfileResponseDto> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream().map(UserProfileResponseDto::new).toList();
     }
 
+    @Transactional
     public UserProfileResponseDto getUserById(Long id) {
         return userRepository.findById(id)
                 .map(UserProfileResponseDto::new).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado") );
     }
+
+    @Transactional
     public UserProfileResponseDto getUserByUsername(String username) {
         return userRepository.findByUserName(username)
                 .map(UserProfileResponseDto::new)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
     }
 
+    @Transactional
     public UserRegisterResponseDto registerUser(UserRegisterDto userDto) {
         if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
             throw new RuntimeException("Senhas não correspondem.") ;
@@ -115,6 +121,7 @@ public class UserService implements UserDetailsService {
         return new UserRegisterResponseDto(userRepository.save(userDto.createUser(userDto, passwordEncoder)));
     }
 
+    @Transactional
     public Optional<User> findById(Long id) {
         return userRepository.findById(id); // delega para o repositório JPA
     }
@@ -140,7 +147,6 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    //BUG ENCONTRADO QUANDO USUÁRIO É ATUALIZADO.
     protected void updateSocialMedia(User user, List<SocialMediaDto> socialMediaDtos) {
         List<UserSocialMidia> existingSocialMedia = new ArrayList<>(user.getUserSocialMidia());
 
