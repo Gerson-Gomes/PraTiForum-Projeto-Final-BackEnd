@@ -1,7 +1,7 @@
 package com.maisprati.forum.service;
 
 
-import com.maisprati.forum.dto.request.TopicDto;
+import com.maisprati.forum.dto.response.TopicResponseDto;
 import com.maisprati.forum.dto.request.TopicRegisterDto;
 import com.maisprati.forum.dto.response.FavoriteTopicResponseDto;
 import com.maisprati.forum.model.Topic;
@@ -65,40 +65,40 @@ public class TopicService {
     }
 
     @Transactional
-    public TopicDto getTopicById(Long id){
-        return topicRepository.findById(id).map(TopicDto::new)
+    public TopicResponseDto getTopicById(Long id){
+        return topicRepository.findById(id).map(TopicResponseDto::new)
                 .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado com id: " + id)
                 );
     }
 
     @Transactional
-    public List<TopicDto> getAllTopics() {
+    public List<TopicResponseDto> getAllTopics() {
         return topicRepository.findAll().stream()
-                .map(TopicDto::new)
+                .map(TopicResponseDto::new)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public TopicDto updateTopic(Long topicId, TopicDto topicDto) {
+    public TopicResponseDto updateTopic(Long topicId, TopicResponseDto topicResponseDto) {
         Topic existingTopic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado com id: " + topicId));
 
-        if (topicDto.getTitle() != null) {
-            existingTopic.setTitle(topicDto.getTitle());
+        if (topicResponseDto.getTitle() != null) {
+            existingTopic.setTitle(topicResponseDto.getTitle());
         }
-        if (topicDto.getContent() != null) {
-            existingTopic.setContent(topicDto.getContent());
+        if (topicResponseDto.getContent() != null) {
+            existingTopic.setContent(topicResponseDto.getContent());
         }
 
         // Tratamento seguro para tags (null-safe e busca com exceção específica)
-        List<Long> tagIds = Optional.ofNullable(topicDto.getTagIds()).orElse(Collections.emptyList());
+        List<Long> tagIds = Optional.ofNullable(topicResponseDto.getTagIds()).orElse(Collections.emptyList());
         List<Tag> tags = tagIds.stream()
                 .map(tagId -> tagRepository.findById(tagId)
                         .orElseThrow(() -> new EntityNotFoundException("Tag não encontrada com id: " + tagId)))
                 .collect(Collectors.toList());
         existingTopic.setTags(tags);
 
-        return new TopicDto(topicRepository.save(existingTopic));
+        return new TopicResponseDto(topicRepository.save(existingTopic));
     }
 
     @Transactional

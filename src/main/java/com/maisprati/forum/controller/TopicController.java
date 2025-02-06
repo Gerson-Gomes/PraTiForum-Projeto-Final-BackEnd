@@ -1,11 +1,10 @@
 package com.maisprati.forum.controller;
 
-import com.maisprati.forum.dto.request.TopicDto;
+import com.maisprati.forum.dto.response.TopicResponseDto;
 import com.maisprati.forum.dto.request.TopicRegisterDto;
 import com.maisprati.forum.dto.response.FavoriteTopicResponseDto;
 import com.maisprati.forum.model.Topic;
 import com.maisprati.forum.service.TopicService;
-import com.maisprati.forum.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.List;
 
 @RestController
@@ -36,21 +34,21 @@ public class TopicController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TopicDto>> getAllTopics() {
+    public ResponseEntity<List<TopicResponseDto>> getAllTopics() {
         var topicDtos = topicService.getAllTopics();
 
         return ResponseEntity.ok().body(topicDtos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TopicDto> getTopicById(@PathVariable Long id) {
+    public ResponseEntity<TopicResponseDto> getTopicById(@PathVariable Long id) {
         var topicDtos = topicService.getTopicById(id);
         return ResponseEntity.ok().body(topicDtos);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TopicDto> updateTopic(@PathVariable Long id, @RequestBody TopicDto topicDto) {
-        var updatedTopicDto = topicService.updateTopic(id, topicDto);
+    public ResponseEntity<TopicResponseDto> updateTopic(@PathVariable Long id, @RequestBody TopicResponseDto topicResponseDto) {
+        var updatedTopicDto = topicService.updateTopic(id, topicResponseDto);
         return ResponseEntity.ok().body(updatedTopicDto);
     }
 
