@@ -1,7 +1,7 @@
 package com.maisprati.forum.service;
 
 
-import com.maisprati.forum.dto.request.TopicDto;
+import com.maisprati.forum.dto.response.TopicResponseDto;
 import com.maisprati.forum.dto.request.TopicRegisterDto;
 import com.maisprati.forum.dto.response.FavoriteTopicResponseDto;
 import com.maisprati.forum.model.Topic;
@@ -12,17 +12,14 @@ import com.maisprati.forum.repository.*;
 import com.maisprati.forum.service.token.TokenService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.ErrorResponseException;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,96 +42,84 @@ public class TopicService {
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional
     public Topic createTopic(TopicRegisterDto topicDto, HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);
-        User user = userRepository.findByUserName(tokenService.extractUsername(token)).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+        User user = userRepository.findByUserName(tokenService.extractUsername(token)).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
 
-        Optional<Tag> tag = tagRepository.findById(topicDto.getTadId());
+        Tag tag = tagRepository.findById(topicDto.getTadId()).orElseThrow(() -> new EntityNotFoundException("Tag não encontrada."));
         List<Tag> listTag = new ArrayList<>();
         Topic topic = new Topic();
 
-
-        listTag.add(tag.get());
+        listTag.add(tag);
         topic.setTitle(topicDto.getTitle());
         topic.setContent(topicDto.getContent());
         topic.setCreationDate(LocalDateTime.now());
-
         topic.setTags(listTag);
         topic.setUser(user);
-
 
         return topicRepository.save(topic);
     }
 
-    public Topic getTopicById(Long id){
-        Topic topic = topicRepository.findById(id)
-                .orElseThrow(() -> {
-                    return new EntityNotFoundException("Tópico não encontrado com id: " + id);
-                });
-        return topic;
+    @Transactional
+    public TopicResponseDto getTopicById(Long id){
+        return topicRepository.findById(id).map(TopicResponseDto::new)
+                .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado com id: " + id)
+                );
     }
 
-    public List<TopicDto> getAllTopics() {
-        return topicRepository.findAll().stream().map(topic -> {
-            TopicDto topicDto = new TopicDto();
-            topicDto.setId(topic.getId());
-            topicDto.setTitle(topic.getTitle());
-            topicDto.setContent(topic.getContent());
-            topicDto.setTagIds(topic.getTags().stream().map(Tag::getId).collect(Collectors.toList()));
-            return topicDto;
-        }).collect(Collectors.toList());
+    @Transactional
+    public List<TopicResponseDto> getAllTopics() {
+        return topicRepository.findAll().stream()
+                .map(TopicResponseDto::new)
+                .collect(Collectors.toList());
     }
 
-    public ResponseEntity<?> addResponse(Long topicId, Response response) {
-        Topic topic = topicRepository.findById(topicId).orElseThrow(() -> new RuntimeException("Tópico não encontrado"));
-        response.setTopic(topic);
-        responseRepository.save(response);
-        return ResponseEntity.ok("Resposta adicionada com sucesso!");
-    }
-
-    public TopicDto updateTopic(Long topicId, TopicDto topicDto) {
-        // Busca o tópico existente com tratamento adequado
+    @Transactional
+    public TopicResponseDto updateTopic(Long topicId, TopicRegisterDto topicRegisterDto,HttpServletRequest request) {
         Topic existingTopic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado com id: " + topicId));
 
-        // Atualiza campos básicos com validação de null
-        if (topicDto.getTitle() != null) {
-            existingTopic.setTitle(topicDto.getTitle());
+        String token = request.getHeader("Authorization").substring(7);
+        User userToken = userRepository.findByUserName(tokenService.extractUsername(token)).orElseThrow(() -> new UsernameNotFoundException("Usuário nao contrado."));
+
+        if (!Objects.equals(userToken.getId(), existingTopic.getId())){
+            throw new SecurityException("Impossível editar um Tópico que não é seu.");
         }
-        if (topicDto.getContent() != null) {
-            existingTopic.setContent(topicDto.getContent());
+
+        if (topicRegisterDto.getTitle() != null) {
+            existingTopic.setTitle(topicRegisterDto.getTitle());
+        }
+        if (topicRegisterDto.getContent() != null) {
+            existingTopic.setContent(topicRegisterDto.getContent());
         }
 
         // Tratamento seguro para tags (null-safe e busca com exceção específica)
-        List<Long> tagIds = Optional.ofNullable(topicDto.getTagIds()).orElse(Collections.emptyList());
+        Optional<Long> tagIds = Optional.ofNullable(topicRegisterDto.getTadId());
         List<Tag> tags = tagIds.stream()
                 .map(tagId -> tagRepository.findById(tagId)
                         .orElseThrow(() -> new EntityNotFoundException("Tag não encontrada com id: " + tagId)))
                 .collect(Collectors.toList());
         existingTopic.setTags(tags);
 
-        // Persistência e conversão para DTO
-        Topic updatedTopic = topicRepository.save(existingTopic);
-        return convertToDto(updatedTopic);
+        return new TopicResponseDto(topicRepository.save(existingTopic));
     }
 
-    private TopicDto convertToDto(Topic topic) {
-        TopicDto dto = new TopicDto();
-        dto.setId(topic.getId());
-        dto.setTitle(topic.getTitle());
-        dto.setContent(topic.getContent());
-        dto.setTagIds(topic.getTags().stream().map(Tag::getId).collect(Collectors.toList()));
-        return dto;
-    }
+    @Transactional
+    public void deleteTopic(Long topicId, HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+        User user = userRepository.findByUserName(tokenService.extractUsername(token)).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
 
-    public void deleteTopic(Long topicId) {
+        Topic existingTopic = topicRepository.findById(topicId).orElseThrow(() -> new EntityNotFoundException("Topic não encontrado"));
 
-        if (responseRepository.existsById(topicId)){
+        if(existingTopic.getUser().equals(user)){
             topicRepository.deleteById(topicId);
         }
+        else throw new SecurityException("Usuário não tem direito de apagar o tópico de outro usuário.");
         ResponseEntity.noContent().build();
     }
 
+    @Transactional
     public FavoriteTopicResponseDto favoriteTopic(Long id, HttpServletRequest request){
         String token = request.getHeader("Authorization").substring(7);
         String username = tokenService.extractUsername(token);
@@ -150,6 +135,7 @@ public class TopicService {
         return new FavoriteTopicResponseDto(id,user.getId());
     }
 
+    @Transactional
     public FavoriteTopicResponseDto unfavoriteTopic(Long id, HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);
         String username = tokenService.extractUsername(token);
@@ -164,5 +150,12 @@ public class TopicService {
         topicRepository.save(topic);
 
         return new FavoriteTopicResponseDto(id, user.getId());
+    }
+
+    public ResponseEntity<?> addResponse(Long topicId, Response response) {
+        Topic topic = topicRepository.findById(topicId).orElseThrow(() -> new RuntimeException("Tópico não encontrado"));
+        response.setTopic(topic);
+        responseRepository.save(response);
+        return ResponseEntity.ok("Resposta adicionada com sucesso!");
     }
 }
