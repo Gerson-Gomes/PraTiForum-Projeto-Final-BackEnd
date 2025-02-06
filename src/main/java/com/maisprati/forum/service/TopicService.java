@@ -19,10 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,19 +76,26 @@ public class TopicService {
     }
 
     @Transactional
-    public TopicResponseDto updateTopic(Long topicId, TopicResponseDto topicResponseDto) {
+    public TopicResponseDto updateTopic(Long topicId, TopicRegisterDto topicRegisterDto,HttpServletRequest request) {
         Topic existingTopic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado com id: " + topicId));
 
-        if (topicResponseDto.getTitle() != null) {
-            existingTopic.setTitle(topicResponseDto.getTitle());
+        String token = request.getHeader("Authorization").substring(7);
+        User userToken = userRepository.findByUserName(tokenService.extractUsername(token)).orElseThrow(() -> new UsernameNotFoundException("Usuário nao contrado."));
+
+        if (!Objects.equals(userToken.getId(), existingTopic.getId())){
+            throw new SecurityException("Impossível editar um Tópico que não é seu.");
         }
-        if (topicResponseDto.getContent() != null) {
-            existingTopic.setContent(topicResponseDto.getContent());
+
+        if (topicRegisterDto.getTitle() != null) {
+            existingTopic.setTitle(topicRegisterDto.getTitle());
+        }
+        if (topicRegisterDto.getContent() != null) {
+            existingTopic.setContent(topicRegisterDto.getContent());
         }
 
         // Tratamento seguro para tags (null-safe e busca com exceção específica)
-        List<Long> tagIds = Optional.ofNullable(topicResponseDto.getTagIds()).orElse(Collections.emptyList());
+        Optional<Long> tagIds = Optional.ofNullable(topicRegisterDto.getTadId());
         List<Tag> tags = tagIds.stream()
                 .map(tagId -> tagRepository.findById(tagId)
                         .orElseThrow(() -> new EntityNotFoundException("Tag não encontrada com id: " + tagId)))

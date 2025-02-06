@@ -47,8 +47,10 @@ public class TopicController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TopicResponseDto> updateTopic(@PathVariable Long id, @RequestBody TopicResponseDto topicResponseDto) {
-        var updatedTopicDto = topicService.updateTopic(id, topicResponseDto);
+    public ResponseEntity<TopicResponseDto> updateTopic(@PathVariable Long id,
+                                                        @RequestBody TopicRegisterDto topicRegisterDto,
+                                                        HttpServletRequest request) {
+        var updatedTopicDto = topicService.updateTopic(id, topicRegisterDto, request);
         return ResponseEntity.ok().body(updatedTopicDto);
     }
 
