@@ -1,6 +1,6 @@
 package com.maisprati.forum.model;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore; // Importando a anotação
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,18 +31,22 @@ public class Response {
     @ManyToOne
     @JoinColumn(name = "user_id")
     @NotNull
+    @JsonIgnore // Ignorando a serialização de 'user'
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "topic_id")
     @NotNull
+    @JsonIgnore // Ignorando a serialização de 'topic'
     private Topic topic;
 
     @Column(name = "creation_date", updatable = false)
+    @JsonIgnore
     private LocalDateTime creationDate = LocalDateTime.now();
 
+
     @Column(name = "last_edition_date")
+    @JsonIgnore
     private LocalDateTime lastEditionDate;
+
 }
-
-
