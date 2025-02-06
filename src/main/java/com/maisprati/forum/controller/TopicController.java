@@ -43,7 +43,7 @@ public class TopicController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Topic> getTopicById(@PathVariable Long id) {
+    public ResponseEntity<TopicDto> getTopicById(@PathVariable Long id) {
         var topicDtos = topicService.getTopicById(id);
         return ResponseEntity.ok().body(topicDtos);
     }

@@ -65,8 +65,8 @@ public class TopicService {
     }
 
     @Transactional
-    public Topic getTopicById(Long id){
-        return topicRepository.findById(id)
+    public TopicDto getTopicById(Long id){
+        return topicRepository.findById(id).map(TopicDto::new)
                 .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado com id: " + id)
                 );
     }
