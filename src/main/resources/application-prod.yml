@@ -20,4 +20,4 @@ spring:
       hibernate:
         show-sql: true
 jwt:
-   secret: ${SECRET_JWT}
+  secret: ${SECRET_JWT}

@@ -1,6 +1,5 @@
 package com.maisprati.forum.model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import jakarta.validation.constraints.Email;
@@ -69,6 +68,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
     @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Topic> topics;
@@ -89,17 +91,22 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
 
-    public User (){
+    public User() {
         this.role = UserRole.USER;
     }
 
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.role == UserRole.ADMIN){
+        if (this.role == UserRole.ADMIN) {
             return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"),
                     new SimpleGrantedAuthority("ROLE_USER"));
-        } else return  List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        } else {
+            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        }
     }
 
     @Override
@@ -128,6 +135,3 @@ public class User implements UserDetails {
     }
 
 }
-
-
-

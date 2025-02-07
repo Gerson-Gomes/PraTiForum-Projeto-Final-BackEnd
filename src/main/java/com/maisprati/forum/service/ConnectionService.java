@@ -5,7 +5,7 @@ import com.maisprati.forum.model.Connection;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.repository.ConnectionRepository;
 import com.maisprati.forum.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor; // Lombok para gerar construtor automaticamente
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,13 +14,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor // Lombok cria o construtor com os campos finais
 public class ConnectionService {
 
-    @Autowired
-    private ConnectionRepository connectionRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    private final ConnectionRepository connectionRepository;
+    private final UserRepository userRepository;
 
     // Método para obter todas as conexões
     public List<Connection> getAllConnections() {
@@ -44,7 +42,6 @@ public class ConnectionService {
 
     // Método para criar uma nova conexão (seguir um usuário)
     public Connection followUser(User follower, User followed) {
-        // Criando e configurando a nova conexão
         Connection connection = new Connection();
         connection.setFollower(follower);
         connection.setFollowed(followed);
@@ -57,4 +54,3 @@ public class ConnectionService {
         connectionRepository.deleteById(id);
     }
 }
-

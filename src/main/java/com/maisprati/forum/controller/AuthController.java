@@ -25,10 +25,9 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserRegisterDto userDto) {
-        var userResponse =  userService.registerUser(userDto);
+        var userResponse = userService.registerUser(userDto);
         return ResponseEntity.ok().body(userResponse);
     }
 
@@ -38,15 +37,14 @@ public class AuthController {
         var auth = this.authenticationManager.authenticate(userAuth);
 
         User user = (User) auth.getPrincipal();
-        var token = tokenService.generateToken(user.getUsername());
+        var token = tokenService.generateToken(user.getUsername(), user.getId());
 
-        return ResponseEntity.ok().body(new LoginResponseDto(
-                token,
-                user.getRole()));
+        return ResponseEntity.ok().body(new LoginResponseDto(token, user.getRole()));
     }
 
-//    @PostMapping("/forgot-password")
-//    public ResponseEntity<?> forgotPassword(@RequestBody String email) {
-//        return userService.forgotPassword(email);
-//    }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody String email) {
+        // Implementar lógica para recuperação de senha, se necessário
+        return ResponseEntity.ok("Instruções de recuperação de senha enviadas para: " + email);
+    }
 }

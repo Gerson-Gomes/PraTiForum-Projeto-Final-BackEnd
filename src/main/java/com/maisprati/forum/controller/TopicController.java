@@ -3,7 +3,6 @@ package com.maisprati.forum.controller;
 import com.maisprati.forum.dto.response.TopicResponseDto;
 import com.maisprati.forum.dto.request.TopicRegisterDto;
 import com.maisprati.forum.dto.response.FavoriteTopicResponseDto;
-import com.maisprati.forum.model.Topic;
 import com.maisprati.forum.service.TopicService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +21,8 @@ public class TopicController {
     private TopicService topicService;
 
     @PostMapping
-    public ResponseEntity<Topic> createTopic(@RequestBody TopicRegisterDto topicDto,  HttpServletRequest request) {
-        var createdTopicDto = topicService.createTopic(topicDto, request);
-
+    public ResponseEntity<TopicResponseDto> createTopic(@RequestBody TopicRegisterDto topicDto, HttpServletRequest request) {
+        TopicResponseDto createdTopicDto = topicService.createTopic(topicDto, request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{topics}")
                 .buildAndExpand(createdTopicDto.getId())
@@ -35,39 +33,38 @@ public class TopicController {
 
     @GetMapping
     public ResponseEntity<List<TopicResponseDto>> getAllTopics() {
-        var topicDtos = topicService.getAllTopics();
-
+        List<TopicResponseDto> topicDtos = topicService.getAllTopics();
         return ResponseEntity.ok().body(topicDtos);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TopicResponseDto> getTopicById(@PathVariable Long id) {
-        var topicDtos = topicService.getTopicById(id);
-        return ResponseEntity.ok().body(topicDtos);
+        TopicResponseDto topicDto = topicService.getTopicById(id);
+        return ResponseEntity.ok().body(topicDto);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<TopicResponseDto> updateTopic(@PathVariable Long id,
                                                         @RequestBody TopicRegisterDto topicRegisterDto,
                                                         HttpServletRequest request) {
-        var updatedTopicDto = topicService.updateTopic(id, topicRegisterDto, request);
+        TopicResponseDto updatedTopicDto = topicService.updateTopic(id, topicRegisterDto, request);
         return ResponseEntity.ok().body(updatedTopicDto);
     }
 
     @PostMapping("/{id}/favorite")
-    public ResponseEntity<FavoriteTopicResponseDto> favoriteTopicById(@PathVariable Long id, HttpServletRequest httpServletRequest){
-        var favoriteTopicDto = topicService.favoriteTopic(id, httpServletRequest);
+    public ResponseEntity<FavoriteTopicResponseDto> favoriteTopicById(@PathVariable Long id, HttpServletRequest httpServletRequest) {
+        FavoriteTopicResponseDto favoriteTopicDto = topicService.favoriteTopic(id, httpServletRequest);
         return ResponseEntity.ok().body(favoriteTopicDto);
     }
 
     @PostMapping("/{id}/unfavorite")
     public ResponseEntity<FavoriteTopicResponseDto> unfavoriteTopicById(@PathVariable Long id, HttpServletRequest httpServletRequest) {
-        var favoriteTopicDto = topicService.unfavoriteTopic(id, httpServletRequest);
+        FavoriteTopicResponseDto favoriteTopicDto = topicService.unfavoriteTopic(id, httpServletRequest);
         return ResponseEntity.ok().body(favoriteTopicDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTopic(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<Void> deleteTopic(@PathVariable Long id, HttpServletRequest request) {
         topicService.deleteTopic(id, request);
         return ResponseEntity.noContent().build();
     }
