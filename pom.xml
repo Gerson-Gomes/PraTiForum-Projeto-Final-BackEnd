@@ -117,6 +117,23 @@
         </dependency>
 
 
+        <!-- https://mvnrepository.com/artifact/com.google.api-client/google-api-client -->
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>2.7.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.google.http-client/google-http-client-jackson2 -->
+        <dependency>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client-jackson2</artifactId>
+            <version>1.46.0</version>
+        </dependency>
+
+
+
+
         <!-- Jakarta Servlet API -->
         <dependency>
             <groupId>jakarta.servlet</groupId>

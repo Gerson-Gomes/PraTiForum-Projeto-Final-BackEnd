@@ -1,6 +1,5 @@
 package com.maisprati.forum.controller;
 
-
 import com.maisprati.forum.dto.request.UserUpdateDto;
 import com.maisprati.forum.dto.response.UserProfileResponseDto;
 import com.maisprati.forum.service.UserService;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
@@ -20,13 +19,13 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserProfileResponseDto>> getAllUsers() {
-        var users = userService.getAllUsers();
+        List<UserProfileResponseDto> users = userService.getAllUsers();
         return ResponseEntity.ok().body(users);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserProfileResponseDto> getUserById(@PathVariable Long id) {
-        var user = userService.getUserById(id);
+        UserProfileResponseDto user = userService.getUserById(id);
         return ResponseEntity.ok().body(user);
     }
 
@@ -35,7 +34,7 @@ public class UserController {
             @PathVariable Long id,
             @RequestBody UserUpdateDto userUpdateDto,
             HttpServletRequest request) {
-        var user = userService.editUser(id, userUpdateDto, request);
+        UserProfileResponseDto user = userService.editUser(id, userUpdateDto, request);
         return ResponseEntity.ok().body(user);
     }
 
@@ -47,7 +46,7 @@ public class UserController {
 
     @GetMapping("/username/{username}")
     public ResponseEntity<UserProfileResponseDto> getUserByUsername(@PathVariable String username) {
-        var user = userService.getUserByUsername(username);
+        UserProfileResponseDto user = userService.getUserByUsername(username);
         return ResponseEntity.ok().body(user);
     }
 }

@@ -3,6 +3,7 @@ package com.maisprati.forum.dto.response;
 import com.maisprati.forum.model.Tag;
 import com.maisprati.forum.model.Topic;
 import lombok.Data;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,7 +12,7 @@ public class TopicResponseDto {
     private Long id;
     private String title;
     private String content;
-    private List<Long> tagIds; // Adicionado para vincular as tags
+    private List<Long> tagIds;
 
     public TopicResponseDto(Topic topic){
         this.id = topic.getId();

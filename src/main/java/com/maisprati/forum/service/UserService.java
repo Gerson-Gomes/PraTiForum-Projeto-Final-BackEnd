@@ -1,6 +1,5 @@
 package com.maisprati.forum.service;
 
-
 import com.maisprati.forum.dto.SocialMediaDto;
 import com.maisprati.forum.dto.request.UserRegisterDto;
 import com.maisprati.forum.dto.request.UserUpdateDto;
@@ -13,7 +12,7 @@ import com.maisprati.forum.repository.UserSocialMidiaRepository;
 import com.maisprati.forum.service.token.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,31 +25,26 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-
 @Service
+@RequiredArgsConstructor // Lombok gera um construtor com todos os campos finais e @Autowired
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserSocialMidiaRepository userSocialMidiaRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private TokenService tokenService;
+    private final UserRepository userRepository;
+    private final UserSocialMidiaRepository userSocialMidiaRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
 
     @Transactional
     public UserProfileResponseDto editUser(Long id, UserUpdateDto userUpdateDto, HttpServletRequest request) {
-        String token = request.getHeader("Authorization").substring(7);
+        String token = getTokenFromRequest(request);
         verifyToken(token);
 
         String username = tokenService.extractUsername(token);
 
-        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
-        User userToken = userRepository.findByUserName(username).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));;
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+        User userToken = userRepository.findByUserName(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
         if (!id.equals(userToken.getId())) {
             throw new SecurityException("Você só pode editar o seu próprio perfil.");
@@ -75,13 +69,14 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void deleteUser(Long id, HttpServletRequest request) {
-        String token = request.getHeader("Authorization").substring(7);
+        String token = getTokenFromRequest(request);
         verifyToken(token);
+
         String username = tokenService.extractUsername(token);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
         User userToken = userRepository.findByUserName(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));;
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
         if (!id.equals(userToken.getId())) {
             throw new SecurityException("Você só pode deletar o seu próprio perfil.");
@@ -99,7 +94,8 @@ public class UserService implements UserDetailsService {
     @Transactional
     public UserProfileResponseDto getUserById(Long id) {
         return userRepository.findById(id)
-                .map(UserProfileResponseDto::new).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado") );
+                .map(UserProfileResponseDto::new)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
     }
 
     @Transactional
@@ -112,10 +108,10 @@ public class UserService implements UserDetailsService {
     @Transactional
     public UserRegisterResponseDto registerUser(UserRegisterDto userDto) {
         if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
-            throw new RuntimeException("Senhas não correspondem.") ;
+            throw new RuntimeException("Senhas não correspondem.");
         }
         if (userRepository.findByUserName(userDto.getEmail()).isPresent()) {
-            throw new RuntimeException("Usuario inválido.");
+            throw new RuntimeException("Usuário já existe.");
         }
 
         return new UserRegisterResponseDto(userRepository.save(userDto.createUser(userDto, passwordEncoder)));
@@ -123,20 +119,27 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public Optional<User> findById(Long id) {
-        return userRepository.findById(id); // delega para o repositório JPA
+        return userRepository.findById(id);
     }
 
+    private String getTokenFromRequest(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        throw new SecurityException("Token não fornecido ou inválido.");
+    }
 
     private static void verifyToken(String token) {
-        if (token == null) {
+        if (token == null || token.isEmpty()) {
             throw new SecurityException("Token inválido.");
         }
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUserName(username).orElseThrow(() ->
-                new UsernameNotFoundException("Usuário não encontrado"));
+        return userRepository.findByUserName(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
     }
 
     private boolean isSocialMediaMatching(UserSocialMidia existing, SocialMediaDto dto) {
@@ -182,8 +185,21 @@ public class UserService implements UserDetailsService {
 
         user.setUserSocialMidia(updatedSocialMedia);
 
-        // Persistindo as mudanças no banco
         userSocialMidiaRepository.saveAll(updatedSocialMedia);
         userSocialMidiaRepository.deleteAll(toRemove);
+    }
+
+    public void storeRefreshToken(String email, String refreshToken) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
+    }
+
+    public String refreshJwtToken(String refreshToken) {
+        User user = userRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado para o refresh token."));
+        // Generate new JWT token
+        return tokenService.generateToken(user.getEmail(), user.getId());
     }
 }

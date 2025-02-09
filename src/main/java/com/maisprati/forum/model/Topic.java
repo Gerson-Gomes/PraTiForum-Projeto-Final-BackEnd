@@ -1,3 +1,4 @@
+
 package com.maisprati.forum.model;
 
 
@@ -64,5 +65,3 @@ public class Topic {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
 }
-
-
