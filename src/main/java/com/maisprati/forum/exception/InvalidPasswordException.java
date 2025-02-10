@@ -3,9 +3,9 @@ package com.maisprati.forum.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class ResourceNotFoundException extends RuntimeException {
-    public ResourceNotFoundException(String message) {
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public class InvalidPasswordException extends RuntimeException {
+    public InvalidPasswordException(String message) {
         super(message);
     }
 }

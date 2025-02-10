@@ -2,6 +2,8 @@ package com.maisprati.forum.controller;
 
 import com.maisprati.forum.dto.request.ConnectionDto;
 import com.maisprati.forum.dto.response.ConnectionResponseDto;
+import com.maisprati.forum.exception.ConnectionNotFoundException;
+import com.maisprati.forum.exception.UserNotFoundException;
 import com.maisprati.forum.model.Connection;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.service.ConnectionService;
@@ -15,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -39,43 +40,52 @@ public class ConnectionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ConnectionResponseDto> getConnectionById(@PathVariable Long id) {
-        Optional<Connection> connection = connectionService.getConnectionById(id);
-        return connection.map(conn -> ResponseEntity.ok(new ConnectionResponseDto(conn)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        try {
+            Connection connection = connectionService.getConnectionById(id);
+            return ResponseEntity.ok(new ConnectionResponseDto(connection));
+        } catch (ConnectionNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<ConnectionResponseDto>> getConnectionsByUser(@PathVariable Long userId,
                                                                             @RequestParam int page,
                                                                             @RequestParam int size) {
-        Optional<User> userOptional = connectionService.findUserById(userId);
-        if (userOptional.isEmpty()) {
+        try {
+            User user = connectionService.findUserById(userId);
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Connection> connections = connectionService.getConnectionsByUser(user, pageable);
+            Page<ConnectionResponseDto> connectionDtos = connections.map(ConnectionResponseDto::new);
+            return ResponseEntity.ok(connectionDtos);
+        } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-
-        User user = userOptional.get();
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Connection> connections = connectionService.getConnectionsByUser(user, pageable);
-
-        Page<ConnectionResponseDto> connectionDtos = connections.map(ConnectionResponseDto::new);
-        return ResponseEntity.ok(connectionDtos);
     }
 
     @PostMapping("/follow")
     public ResponseEntity<ConnectionResponseDto> followUser(@RequestBody ConnectionDto connectionDto) {
-        User follower = userService.findById(connectionDto.getFollowerId())
-                .orElseThrow(() -> new RuntimeException("Follower not found"));
-        User followed = userService.findById(connectionDto.getFollowedId())
-                .orElseThrow(() -> new RuntimeException("Followed not found"));
+        try {
+            User follower = userService.findById(connectionDto.getFollowerId())
+                    .orElseThrow(() -> new UserNotFoundException("Follower not found"));
+            User followed = userService.findById(connectionDto.getFollowedId())
+                    .orElseThrow(() -> new UserNotFoundException("Followed not found"));
 
-        Connection newConnection = connectionService.followUser(follower, followed);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ConnectionResponseDto(newConnection));
+            Connection newConnection = connectionService.followUser(follower, followed);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ConnectionResponseDto(newConnection));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> unfollowUser(@PathVariable Long id) {
-        connectionService.unfollowUser(id);
-        return ResponseEntity.noContent().build();
+        try {
+            connectionService.unfollowUser(id);
+            return ResponseEntity.noContent().build();
+        } catch (ConnectionNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }
