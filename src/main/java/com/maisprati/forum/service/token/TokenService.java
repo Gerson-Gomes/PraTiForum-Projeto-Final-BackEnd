@@ -10,7 +10,6 @@ import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
 
-
 @Service
 public class TokenService {
 
@@ -21,7 +20,6 @@ public class TokenService {
      * Gera uma chave de assinatura com o segredo
      * @return
      */
-
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
@@ -61,9 +59,10 @@ public class TokenService {
     /**
      * Gera um token JWT para um usuário.
      */
-    public String generateToken(String username) {
+    public String generateToken(String username, Long userId) {
         return Jwts.builder()
                 .setSubject(username) // Define o "subject" (nome do usuário)
+                .claim("userId", userId) // Adiciona o ID do usuário como claim
                 .setIssuedAt(new Date()) // Data de emissão
                 .setExpiration(generateExpirationDate())
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256) // Assina o token
@@ -100,10 +99,9 @@ public class TokenService {
     }
 
     /**
-    Metodo para calcular data de expiração
+     Metodo para calcular data de expiração
      */
     private long calculateExpirationInMillis() {
         return 1000 * 60 * 20; // 20 minutos em milissegundos
     }
-
 }

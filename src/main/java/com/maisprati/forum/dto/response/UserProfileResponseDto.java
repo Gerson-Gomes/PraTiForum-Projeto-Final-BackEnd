@@ -35,14 +35,12 @@ public class UserProfileResponseDto {
 
         if (user.getUserSocialMidia() != null) {
             this.socialMedia = user.getUserSocialMidia().stream()
-                    .map(sm -> {
-                        SocialMediaDto dto = new SocialMediaDto();
-                        dto.setGitProfile(sm.getGitProfile());
-                        dto.setDiscordProfile(sm.getDiscordProfile());
-                        dto.setLinkedinProfile(sm.getLinkedinProfile());
-                        dto.setInstagramProfile(sm.getInstagramProfile());
-                        return dto;
-                    })
+                    .map(sm -> new SocialMediaDto(
+                            sm.getGitProfile(),
+                            sm.getDiscordProfile(),
+                            sm.getLinkedinProfile(),
+                            sm.getInstagramProfile()
+                    ))
                     .collect(Collectors.toList());
         }
     }

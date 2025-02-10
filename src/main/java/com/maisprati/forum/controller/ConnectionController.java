@@ -92,14 +92,6 @@ public class ConnectionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newConnection);
     }
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public class UserNotFoundException extends RuntimeException {
-        public UserNotFoundException(String message) {
-            super(message);
-        }
-    }
-
-
     // Método para desfazer o "follow" (deixar de seguir)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> unfollowUser(@PathVariable Long id) {
