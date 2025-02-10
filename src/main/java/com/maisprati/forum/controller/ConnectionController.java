@@ -1,6 +1,8 @@
 package com.maisprati.forum.controller;
 
 import com.maisprati.forum.dto.request.ConnectionDto;
+import com.maisprati.forum.exceptions.ConnectionException;
+import com.maisprati.forum.exceptions.UserNotFoundException;
 import com.maisprati.forum.model.Connection;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.service.ConnectionService;
@@ -69,16 +71,34 @@ public class ConnectionController {
     public ResponseEntity<Connection> followUser(@RequestBody ConnectionDto connectionDto) {
         // Buscar os usuários por ID no DTO
         User follower = userService.findById(connectionDto.getFollowerId())
-                .orElseThrow(() -> new RuntimeException("Follower not found"));  // Verifica se o seguidor existe
+                .orElseThrow(() -> new UserNotFoundException("Usuário seguidor não encontrado."));
         User followed = userService.findById(connectionDto.getFollowedId())
-                .orElseThrow(() -> new RuntimeException("Followed not found"));  // Verifica se o seguido existe
+                .orElseThrow(() -> new UserNotFoundException("Usuário seguido não encontrado."));
 
-        // Lógica para criar a nova conexão (seguir o usuário)
+        // Impedir que um usuário siga a si mesmo
+        if (follower.getId().equals(followed.getId())) {
+            throw new ConnectionException("Você não pode seguir a si mesmo.");
+        }
+
+        // Impedir que um usuário siga alguém que já está seguindo
+        if (connectionService.isFollowing(follower, followed)) {
+            throw new ConnectionException("Você já está seguindo este usuário.");
+        }
+
+        // Criar a nova conexão (seguir o usuário)
         Connection newConnection = connectionService.followUser(follower, followed);
 
         // Retorna a conexão criada com status CREATED
         return ResponseEntity.status(HttpStatus.CREATED).body(newConnection);
     }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public class UserNotFoundException extends RuntimeException {
+        public UserNotFoundException(String message) {
+            super(message);
+        }
+    }
+
 
     // Método para desfazer o "follow" (deixar de seguir)
     @DeleteMapping("/{id}")

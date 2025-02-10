@@ -34,6 +34,7 @@ public class WebSecurityConfig {
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/topics").hasRole("USER")
                         .requestMatchers("/api/user/**").hasRole("USER")
                         .anyRequest().authenticated()

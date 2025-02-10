@@ -42,6 +42,12 @@ public class ConnectionService {
         return userRepository.findById(userId);
     }
 
+    // Método para verificar se um usuário já está seguindo outro
+    public boolean isFollowing(User follower, User followed) {
+        return connectionRepository.existsByFollowerAndFollowed(follower, followed);
+    }
+
+
     // Método para criar uma nova conexão (seguir um usuário)
     public Connection followUser(User follower, User followed) {
         // Criando e configurando a nova conexão
@@ -57,4 +63,6 @@ public class ConnectionService {
         connectionRepository.deleteById(id);
     }
 }
+
+
 
