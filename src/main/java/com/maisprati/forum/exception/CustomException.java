@@ -1,4 +1,4 @@
-package com.maisprati.forum.exceptions;
+package com.maisprati.forum.exception;
 
 public class CustomException extends RuntimeException {
     private final int status;

@@ -1,8 +1,8 @@
 package com.maisprati.forum.controller;
 
 import com.maisprati.forum.dto.request.ConnectionDto;
-import com.maisprati.forum.exceptions.ConnectionException;
-import com.maisprati.forum.exceptions.UserNotFoundException;
+import com.maisprati.forum.exception.ConnectionException;
+import com.maisprati.forum.exception.UserNotFoundException;
 import com.maisprati.forum.model.Connection;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.service.ConnectionService;

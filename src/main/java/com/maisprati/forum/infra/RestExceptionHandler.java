@@ -1,7 +1,7 @@
 package com.maisprati.forum.infra;
 
-import com.maisprati.forum.exceptions.CustomException;
-import com.maisprati.forum.exceptions.UserNotFoundException;
+import com.maisprati.forum.exception.CustomException;
+import com.maisprati.forum.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
