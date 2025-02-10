@@ -38,13 +38,13 @@ public class ResolutionController {
     @PostMapping
     public ResponseEntity<ResolutionDto> chooseBestResponse(@RequestParam Long topicId, @RequestParam Long responseId) {
         Optional<Topic> topicOptional = Optional.ofNullable(topicService.getTopicById(topicId));
-        Optional<Response> response = responseService.getResponseById(responseId);
+        Response response = responseService.getResponseById(responseId);
 
-        if (topicOptional.isEmpty() || response.isEmpty()) {
+        if (topicOptional.isEmpty() || response == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        Resolution resolution = resolutionService.saveResolution(topicOptional.get(), response.get());
+        Resolution resolution = resolutionService.saveResolution(topicOptional.get(), response);
         return ResponseEntity.ok(new ResolutionDto(resolution));
     }
 }
