@@ -40,11 +40,19 @@ public class ResolutionController {
         Optional<Topic> topicOptional = Optional.ofNullable(topicService.getTopicById(topicId));
         Response response = responseService.getResponseById(responseId);
 
-        if (topicOptional.isEmpty() || response == null) {
-            return ResponseEntity.badRequest().build();
+        if (topicOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
         }
 
-        Resolution resolution = resolutionService.saveResolution(topicOptional.get(), response);
+        Topic topic = topicOptional.get();
+
+        // Verifica se a resposta pertence ao tópico antes de escolhê-la
+        if (!response.getTopic().getId().equals(topicId)) {
+            return ResponseEntity.badRequest()
+                    .body(null); // Poderia ser uma mensagem JSON explicando o erro
+        }
+
+        Resolution resolution = resolutionService.saveResolution(topic, response);
         return ResponseEntity.ok(new ResolutionDto(resolution));
     }
 }

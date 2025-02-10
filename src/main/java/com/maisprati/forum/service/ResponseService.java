@@ -20,6 +20,9 @@ public class ResponseService {
     }
 
     public Response getResponseById(Long id) {
+        if (id == null || id < 1) {
+            throw new IllegalArgumentException("ID da resposta deve ser um número válido.");
+        }
         return responseRepository.findById(id)
                 .orElseThrow(() -> new ResponseNotFoundException("Resposta com ID " + id + " não encontrada."));
     }
