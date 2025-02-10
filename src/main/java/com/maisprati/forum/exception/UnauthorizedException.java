@@ -1,3 +1,4 @@
+
 package com.maisprati.forum.exception;
 
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,8 @@
 package com.maisprati.forum.service;
 
 import com.maisprati.forum.dto.TagDto;
+import com.maisprati.forum.exception.TagAlreadyExistsException;
+import com.maisprati.forum.exception.TagNotFoundException;
 import com.maisprati.forum.model.Tag;
 import com.maisprati.forum.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +19,7 @@ public class TagService {
 
     public TagDto createTag(TagDto tagDto) {
         if (tagRepository.findTagByName(tagDto.getName()).isPresent()) {
-            throw new IllegalArgumentException("Já existe uma tag com o nome fornecido.");
+            throw new TagAlreadyExistsException("Já existe uma tag com o nome fornecido.");
         }
         Tag tag = new Tag();
         tag.setName(tagDto.getName());
@@ -34,7 +36,7 @@ public class TagService {
 
     public TagDto updateTag(Long id, TagDto tagDto) {
         Tag existingTag = tagRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tag não encontrada"));
+                .orElseThrow(() -> new TagNotFoundException("Tag não encontrada"));
         existingTag.setName(tagDto.getName());
         Tag updatedTag = tagRepository.save(existingTag);
 
@@ -43,11 +45,14 @@ public class TagService {
 
     public TagDto getTagByName(String name) {
         Tag tag = tagRepository.findTagByName(name)
-                .orElseThrow(() -> new RuntimeException("Tag não encontrada com o nome: " + name));
+                .orElseThrow(() -> new TagNotFoundException("Tag não encontrada com o nome: " + name));
         return new TagDto(tag.getName());
     }
 
     public void deleteTag(Long id) {
+        if (!tagRepository.existsById(id)) {
+            throw new TagNotFoundException("Tag não encontrada com id: " + id);
+        }
         tagRepository.deleteById(id);
     }
 }
