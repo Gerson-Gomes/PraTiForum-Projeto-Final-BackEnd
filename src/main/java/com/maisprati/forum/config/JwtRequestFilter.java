@@ -32,12 +32,17 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain chain)
             throws ServletException, IOException {
-        String token = recoverToken(request);
 
-        if (request.getServletPath().startsWith("/api/auth")) {
+        String requestURI = request.getRequestURI();
+
+        if (requestURI.startsWith("/v3/api-docs") ||
+                requestURI.startsWith("/swagger-ui") ||
+                requestURI.startsWith("/actuator")) {
             chain.doFilter(request, response);
             return;
         }
+
+        String token = recoverToken(request);
 
         try {
             if (token != null ) {

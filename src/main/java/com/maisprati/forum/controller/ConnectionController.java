@@ -1,8 +1,7 @@
 package com.maisprati.forum.controller;
 
 import com.maisprati.forum.dto.request.ConnectionDto;
-import com.maisprati.forum.dto.response.ConnectionResponseDto;
-import com.maisprati.forum.exception.ConnectionNotFoundException;
+import com.maisprati.forum.exception.ConnectionException;
 import com.maisprati.forum.exception.UserNotFoundException;
 import com.maisprati.forum.model.Connection;
 import com.maisprati.forum.model.User;
@@ -17,7 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/connections")
@@ -29,63 +28,74 @@ public class ConnectionController {
     @Autowired
     private UserService userService;
 
+    // Método para obter todas as conexões
     @GetMapping
-    public ResponseEntity<List<ConnectionResponseDto>> getAllConnections() {
+    public ResponseEntity<List<Connection>> getAllConnections() {
         List<Connection> connections = connectionService.getAllConnections();
-        List<ConnectionResponseDto> connectionDtos = connections.stream()
-                .map(ConnectionResponseDto::new)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(connectionDtos);
+        return ResponseEntity.ok(connections);
     }
 
+    // Método para obter uma conexão específica pelo ID
     @GetMapping("/{id}")
-    public ResponseEntity<ConnectionResponseDto> getConnectionById(@PathVariable Long id) {
-        try {
-            Connection connection = connectionService.getConnectionById(id);
-            return ResponseEntity.ok(new ConnectionResponseDto(connection));
-        } catch (ConnectionNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    public ResponseEntity<Connection> getConnectionById(@PathVariable Long id) {
+        Optional<Connection> connection = connectionService.getConnectionById(id);
+
+        return connection.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+    // Método para obter conexões de um usuário com paginação
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Page<ConnectionResponseDto>> getConnectionsByUser(@PathVariable Long userId,
-                                                                            @RequestParam int page,
-                                                                            @RequestParam int size) {
-        try {
-            User user = connectionService.findUserById(userId);
-            Pageable pageable = PageRequest.of(page, size);
-            Page<Connection> connections = connectionService.getConnectionsByUser(user, pageable);
-            Page<ConnectionResponseDto> connectionDtos = connections.map(ConnectionResponseDto::new);
-            return ResponseEntity.ok(connectionDtos);
-        } catch (UserNotFoundException e) {
+    public ResponseEntity<Page<Connection>> getConnectionsByUser(@PathVariable Long userId,
+                                                                 @RequestParam int page,
+                                                                 @RequestParam int size) {
+        // Buscar o usuário pelo ID
+        Optional<User> userOptional = connectionService.findUserById(userId);
+        if (userOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+
+        User user = userOptional.get();
+
+        // Configurar a paginação
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Obtendo as conexões do usuário com paginação em casos de muitos seguidores.
+        Page<Connection> connections = connectionService.getConnectionsByUser(user, pageable);
+
+        // Retorna as conexões com status OK
+        return ResponseEntity.ok(connections);
     }
 
+    // Método para seguir um usuário
     @PostMapping("/follow")
-    public ResponseEntity<ConnectionResponseDto> followUser(@RequestBody ConnectionDto connectionDto) {
-        try {
-            User follower = userService.findById(connectionDto.getFollowerId())
-                    .orElseThrow(() -> new UserNotFoundException("Follower not found"));
-            User followed = userService.findById(connectionDto.getFollowedId())
-                    .orElseThrow(() -> new UserNotFoundException("Followed not found"));
+    public ResponseEntity<Connection> followUser(@RequestBody ConnectionDto connectionDto) {
+        // Buscar os usuários por ID no DTO
+        User follower = userService.findById(connectionDto.getFollowerId())
+                .orElseThrow(() -> new UserNotFoundException("Usuário seguidor não encontrado."));
+        User followed = userService.findById(connectionDto.getFollowedId())
+                .orElseThrow(() -> new UserNotFoundException("Usuário seguido não encontrado."));
 
-            Connection newConnection = connectionService.followUser(follower, followed);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ConnectionResponseDto(newConnection));
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        // Impedir que um usuário siga a si mesmo
+        if (follower.getId().equals(followed.getId())) {
+            throw new ConnectionException("Você não pode seguir a si mesmo.");
         }
+
+        // Impedir que um usuário siga alguém que já está seguindo
+        if (connectionService.isFollowing(follower, followed)) {
+            throw new ConnectionException("Você já está seguindo este usuário.");
+        }
+
+        // Criar a nova conexão (seguir o usuário)
+        Connection newConnection = connectionService.followUser(follower, followed);
+
+        // Retorna a conexão criada com status CREATED
+        return ResponseEntity.status(HttpStatus.CREATED).body(newConnection);
     }
 
+    // Método para desfazer o "follow" (deixar de seguir)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> unfollowUser(@PathVariable Long id) {
-        try {
-            connectionService.unfollowUser(id);
-            return ResponseEntity.noContent().build();
-        } catch (ConnectionNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        connectionService.unfollowUser(id);
+        return ResponseEntity.noContent().build();
     }
 }

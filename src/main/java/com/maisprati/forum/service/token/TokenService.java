@@ -1,5 +1,7 @@
 package com.maisprati.forum.service.token;
 
+import com.maisprati.forum.exception.TokenExpiredException;
+import com.maisprati.forum.exception.TokenInvalidExpection;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,9 +52,9 @@ public class TokenService {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
-            throw new RuntimeException("Token expirado.", e);
+            throw new TokenExpiredException("Token expirado.");
         } catch (JwtException | IllegalArgumentException e) {
-            throw new RuntimeException("Token inválido ou mal formado.", e);
+            throw new TokenInvalidExpection("Token inválido ou mal formado.");
         }
     }
 
