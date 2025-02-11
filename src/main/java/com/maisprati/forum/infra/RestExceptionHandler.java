@@ -1,7 +1,6 @@
 package com.maisprati.forum.infra;
 
 import com.maisprati.forum.exception.*;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
