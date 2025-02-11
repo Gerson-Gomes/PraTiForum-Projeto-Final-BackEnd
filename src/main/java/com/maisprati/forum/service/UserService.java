@@ -18,9 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -71,7 +69,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
         if (!id.equals(userToken.getId())) {
-            throw new InvalidTokenException("Você só pode deletar o seu próprio perfil.");
+            throw new TokenInvalidExpection("Você só pode deletar o seu próprio perfil.");
         }
 
         userRepository.delete(user);
@@ -127,12 +125,12 @@ public class UserService implements UserDetailsService {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7);
         }
-        throw new InvalidTokenException("Token não fornecido ou inválido.");
+        throw new TokenInvalidExpection("Token não fornecido ou inválido.");
     }
 
     private static void verifyToken(String token) {
         if (token == null || token.isEmpty()) {
-            throw new InvalidTokenException("Token inválido.");
+            throw new TokenInvalidExpection("Token inválido.");
         }
     }
 
