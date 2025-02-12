@@ -31,7 +31,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public UserProfileResponseDto editUser(Long id, UserUpdateDto userUpdateDto, HttpServletRequest request) {
-        String token = getTokenFromRequest(request);
+        String token = tokenService.getTokenFromRequest(request);
         verifyToken(token);
 
         String username = tokenService.extractUsername(token);
@@ -59,7 +59,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void deleteUser(Long id, HttpServletRequest request) {
-        String token = getTokenFromRequest(request);
+        String token = tokenService.getTokenFromRequest(request);
         verifyToken(token);
 
         String username = tokenService.extractUsername(token);
@@ -118,14 +118,6 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
         user.setRefreshToken(refreshToken);
         userRepository.save(user);
-    }
-
-    private String getTokenFromRequest(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
-        }
-        throw new TokenInvalidExpection("Token não fornecido ou inválido.");
     }
 
     private static void verifyToken(String token) {

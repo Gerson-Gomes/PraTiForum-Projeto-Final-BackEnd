@@ -3,17 +3,9 @@ package com.maisprati.forum.service;
 import com.maisprati.forum.dto.request.TopicRegisterDto;
 import com.maisprati.forum.dto.response.FavoriteTopicResponseDto;
 import com.maisprati.forum.dto.response.TopicResponseDto;
-import com.maisprati.forum.exception.TagNotFoundException;
-import com.maisprati.forum.exception.TopicNotFoundException;
-import com.maisprati.forum.exception.UnauthorizedException;
-import com.maisprati.forum.model.Response;
-import com.maisprati.forum.model.Tag;
-import com.maisprati.forum.model.Topic;
-import com.maisprati.forum.model.User;
-import com.maisprati.forum.repository.ResponseRepository;
-import com.maisprati.forum.repository.TagRepository;
-import com.maisprati.forum.repository.TopicRepository;
-import com.maisprati.forum.repository.UserRepository;
+import com.maisprati.forum.exception.*;
+import com.maisprati.forum.model.*;
+import com.maisprati.forum.repository.*;
 import com.maisprati.forum.utils.TokenService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,6 +31,7 @@ public class TopicService {
     private final UserRepository userRepository;
     private final ResponseRepository responseRepository;
     private final TokenService tokenService;
+    private final LikeRepository likeRepository;
 
     public TopicResponseDto createTopic(TopicRegisterDto topicDto, HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);
@@ -147,6 +140,52 @@ public class TopicService {
         topicRepository.save(topic);
 
         return new FavoriteTopicResponseDto(id, user.getId());
+    }
+
+    @Transactional
+    public Like likeTopic(Long topicId, String token){
+        User userHowLiked = userRepository.findById(tokenService.extractUserId(token)).orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+        Topic topicLiked = topicRepository.findById(topicId).orElseThrow(() -> new TopicNotFoundException("Tópico não encontrado."));
+
+        boolean alreadyLiked = topicLiked.getLikes().stream()
+                .anyMatch(like -> like.getUser().equals(userHowLiked));
+
+        if(alreadyLiked){
+            throw new UserAlreadyLikedTopicException("Usuário já curtiu o tópico.");
+        }
+
+        return likeRepository.save(new Like(topicLiked, userHowLiked));
+    }
+
+    @Transactional
+    public Like unlikeTopic(Long topicId, String token) {
+        // Recupera o usuário que deseja desfazer a curtida
+        User user = userRepository.findById(tokenService.extractUserId(token))
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+
+        // Recupera o tópico a ser descurtido
+        Topic topic = topicRepository.findById(topicId)
+                .orElseThrow(() -> new TopicNotFoundException("Tópico não encontrado."));
+
+        // Busca o objeto Like correspondente ao usuário no tópico
+        Optional<Like> likeOptional = topic.getLikes().stream()
+                .filter(like -> like.getUser().equals(user))
+                .findFirst();
+
+        if (likeOptional.isEmpty()) {
+            // Se o usuário não curtiu o tópico, lança exceção
+            throw new UserHasNotLikedTopicException("Usuário não curtiu o tópico.");
+        }
+
+        Like like = likeOptional.get();
+
+        // (Opcional) Remove o like da lista de likes do tópico, se o relacionamento for bidirecional
+        topic.getLikes().remove(like);
+
+        // Remove o Like do repositório
+        likeRepository.delete(like);
+
+        return like;
     }
 
     public ResponseEntity<?> addResponse(Long topicId, Response response) {

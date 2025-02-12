@@ -4,6 +4,7 @@ import com.maisprati.forum.exception.TokenExpiredException;
 import com.maisprati.forum.exception.TokenInvalidExpection;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -105,5 +106,17 @@ public class TokenService {
      */
     private long calculateExpirationInMillis() {
         return 1000 * 60 * 20; // 20 minutos em milissegundos
+    }
+
+    public String getTokenFromRequest(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        throw new TokenInvalidExpection("Token não fornecido ou inválido.");
+    }
+
+    public Long extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", Long.class));
     }
 }
