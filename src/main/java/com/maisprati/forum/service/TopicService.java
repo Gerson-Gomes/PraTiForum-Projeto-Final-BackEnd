@@ -7,7 +7,6 @@ import com.maisprati.forum.exception.*;
 import com.maisprati.forum.model.*;
 import com.maisprati.forum.repository.*;
 import com.maisprati.forum.utils.TokenService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -158,34 +157,26 @@ public class TopicService {
     }
 
     @Transactional
-    public Like unlikeTopic(Long topicId, String token) {
-        // Recupera o usuário que deseja desfazer a curtida
+    public void unlikeTopic(Long topicId, String token) {
         User user = userRepository.findById(tokenService.extractUserId(token))
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
-        // Recupera o tópico a ser descurtido
         Topic topic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new TopicNotFoundException("Tópico não encontrado."));
 
-        // Busca o objeto Like correspondente ao usuário no tópico
         Optional<Like> likeOptional = topic.getLikes().stream()
                 .filter(like -> like.getUser().equals(user))
                 .findFirst();
 
         if (likeOptional.isEmpty()) {
-            // Se o usuário não curtiu o tópico, lança exceção
             throw new UserHasNotLikedTopicException("Usuário não curtiu o tópico.");
         }
 
         Like like = likeOptional.get();
 
-        // (Opcional) Remove o like da lista de likes do tópico, se o relacionamento for bidirecional
         topic.getLikes().remove(like);
-
-        // Remove o Like do repositório
         likeRepository.delete(like);
 
-        return like;
     }
 
     public ResponseEntity<?> addResponse(Long topicId, Response response) {

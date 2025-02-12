@@ -64,11 +64,10 @@ public class TopicController {
         return ResponseEntity.ok().body(favoriteTopicDto);
     }
 
-    @PostMapping("/unfavorite/{id}")
+    @DeleteMapping("/unfavorite/{id}")
     public ResponseEntity<FavoriteTopicResponseDto> unfavoriteTopicById(@PathVariable Long id, HttpServletRequest httpServletRequest) {
-        FavoriteTopicResponseDto favoriteTopicDto = topicService.unfavoriteTopic(id, httpServletRequest);
-        return ResponseEntity.ok().body(favoriteTopicDto);
-    }
+        topicService.unfavoriteTopic(id, httpServletRequest);
+        return ResponseEntity.noContent().build();    }
 
     @PostMapping("/like/{id}")
     public ResponseEntity<Like> likeTopic(@PathVariable Long id, HttpServletRequest httpServletRequest){
@@ -83,7 +82,7 @@ public class TopicController {
         return ResponseEntity.created(location).body(like);
     }
 
-    @DeleteMapping("/like/{id}")
+    @DeleteMapping("/unlike/{id}")
     public ResponseEntity<Void> unlikeTopic(@PathVariable Long id, HttpServletRequest request) {
         String token = tokenService.getTokenFromRequest(request);
         topicService.unlikeTopic(id, token);
