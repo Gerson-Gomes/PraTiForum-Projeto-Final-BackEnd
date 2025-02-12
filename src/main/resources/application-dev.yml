@@ -36,3 +36,12 @@ spring:
 jwt:
   secret: ${SECRET_JWT}
   expiration: 3600000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui/index.html
+    operationsSorter: method
+    tagsSorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  default-produces-media-type: application/json

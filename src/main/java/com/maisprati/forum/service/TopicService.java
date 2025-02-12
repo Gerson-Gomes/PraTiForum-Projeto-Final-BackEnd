@@ -3,6 +3,7 @@ package com.maisprati.forum.service;
 import com.maisprati.forum.dto.request.TopicRegisterDto;
 import com.maisprati.forum.dto.response.FavoriteTopicResponseDto;
 import com.maisprati.forum.dto.response.TopicResponseDto;
+import com.maisprati.forum.exception.TagNotFoundException;
 import com.maisprati.forum.exception.TopicNotFoundException;
 import com.maisprati.forum.exception.UnauthorizedException;
 import com.maisprati.forum.model.Response;
@@ -45,7 +46,7 @@ public class TopicService {
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
 
         Tag tag = tagRepository.findById(topicDto.getTadId())
-                .orElseThrow(() -> new EntityNotFoundException("Tag não encontrada."));
+                .orElseThrow(() -> new TagNotFoundException("Tag não encontrada."));
 
         Topic topic = new Topic();
         topic.setTitle(topicDto.getTitle());
@@ -94,7 +95,7 @@ public class TopicService {
 
         Optional<Long> tagId = Optional.ofNullable(topicRegisterDto.getTadId());
         List<Tag> tags = tagId.map(id -> tagRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException("Tag não encontrada com id: " + id)))
+                        .orElseThrow(() -> new TagNotFoundException("Tag não encontrada com id: " + id)))
                 .map(Collections::singletonList)
                 .orElse(Collections.emptyList());
         existingTopic.setTags(tags);
