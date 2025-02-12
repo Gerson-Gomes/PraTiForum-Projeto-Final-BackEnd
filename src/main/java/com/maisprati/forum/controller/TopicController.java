@@ -1,5 +1,6 @@
 package com.maisprati.forum.controller;
 
+import com.maisprati.forum.dto.response.LikeResponseDto;
 import com.maisprati.forum.dto.response.TopicResponseDto;
 import com.maisprati.forum.dto.request.TopicRegisterDto;
 import com.maisprati.forum.dto.response.FavoriteTopicResponseDto;
@@ -70,13 +71,13 @@ public class TopicController {
         return ResponseEntity.noContent().build();    }
 
     @PostMapping("/like/{id}")
-    public ResponseEntity<Like> likeTopic(@PathVariable Long id, HttpServletRequest httpServletRequest){
+    public ResponseEntity<LikeResponseDto> likeTopic(@PathVariable Long id, HttpServletRequest httpServletRequest){
         String  token = tokenService.getTokenFromRequest(httpServletRequest);
-        Like like = topicService.likeTopic(id, token);
+        LikeResponseDto like = topicService.likeTopic(id, token);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{topics}")
-                .buildAndExpand(like.getId())
+                .buildAndExpand(like.getLikeId())
                 .toUri();
 
         return ResponseEntity.created(location).body(like);

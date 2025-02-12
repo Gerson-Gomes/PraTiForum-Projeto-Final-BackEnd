@@ -2,6 +2,7 @@ package com.maisprati.forum.service;
 
 import com.maisprati.forum.dto.request.TopicRegisterDto;
 import com.maisprati.forum.dto.response.FavoriteTopicResponseDto;
+import com.maisprati.forum.dto.response.LikeResponseDto;
 import com.maisprati.forum.dto.response.TopicResponseDto;
 import com.maisprati.forum.exception.*;
 import com.maisprati.forum.model.*;
@@ -142,7 +143,7 @@ public class TopicService {
     }
 
     @Transactional
-    public Like likeTopic(Long topicId, String token){
+    public LikeResponseDto likeTopic(Long topicId, String token){
         User userHowLiked = userRepository.findById(tokenService.extractUserId(token)).orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
         Topic topicLiked = topicRepository.findById(topicId).orElseThrow(() -> new TopicNotFoundException("Tópico não encontrado."));
 
@@ -153,7 +154,8 @@ public class TopicService {
             throw new UserAlreadyLikedTopicException("Usuário já curtiu o tópico.");
         }
 
-        return likeRepository.save(new Like(topicLiked, userHowLiked));
+        Like like = likeRepository.save(new Like(topicLiked, userHowLiked));
+        return new LikeResponseDto(like.getId(), like.getUser(), like.getTopic());
     }
 
     @Transactional
