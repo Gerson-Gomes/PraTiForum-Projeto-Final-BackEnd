@@ -30,7 +30,6 @@ public class GoogleTokenService {
         requestBody.put("redirect_uri", redirectUri);
         requestBody.put("grant_type", "authorization_code");
 
-        Map<String, String> response = restTemplate.postForObject(tokenEndpoint, requestBody, Map.class);
-        return response;
+        return restTemplate.postForObject(tokenEndpoint, requestBody, Map.class);
     }
 }
