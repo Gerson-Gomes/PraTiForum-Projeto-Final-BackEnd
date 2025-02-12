@@ -7,7 +7,7 @@ import com.maisprati.forum.dto.response.UserRegisterResponseDto;
 import com.maisprati.forum.exception.*;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.repository.UserRepository;
-import com.maisprati.forum.service.token.TokenService;
+import com.maisprati.forum.utils.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service

@@ -6,7 +6,7 @@ import com.maisprati.forum.model.UserRole;
 import com.maisprati.forum.service.GoogleTokenService;
 import com.maisprati.forum.service.GoogleTokenVerifier;
 import com.maisprati.forum.service.UserService;
-import com.maisprati.forum.service.token.TokenService;
+import com.maisprati.forum.utils.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;

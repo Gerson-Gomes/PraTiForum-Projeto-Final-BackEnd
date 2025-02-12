@@ -13,7 +13,7 @@ import com.maisprati.forum.repository.ResponseRepository;
 import com.maisprati.forum.repository.TagRepository;
 import com.maisprati.forum.repository.TopicRepository;
 import com.maisprati.forum.repository.UserRepository;
-import com.maisprati.forum.service.token.TokenService;
+import com.maisprati.forum.utils.TokenService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
