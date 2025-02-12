@@ -34,6 +34,11 @@ public class Like {
 
     @Column(updatable = false)
     private LocalDateTime date = LocalDateTime.now();
+
+    public Like(Topic topic, User user) {
+        this.topic = topic;
+        this.user = user;
+    }
 }
 
 

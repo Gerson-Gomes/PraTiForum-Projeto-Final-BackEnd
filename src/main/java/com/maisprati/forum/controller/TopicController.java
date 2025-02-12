@@ -1,9 +1,13 @@
 package com.maisprati.forum.controller;
 
+import com.maisprati.forum.dto.response.LikeResponseDto;
 import com.maisprati.forum.dto.response.TopicResponseDto;
 import com.maisprati.forum.dto.request.TopicRegisterDto;
 import com.maisprati.forum.dto.response.FavoriteTopicResponseDto;
+import com.maisprati.forum.model.Like;
 import com.maisprati.forum.service.TopicService;
+import com.maisprati.forum.service.UserService;
+import com.maisprati.forum.utils.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +23,10 @@ public class TopicController {
 
     @Autowired
     private TopicService topicService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private TokenService tokenService;
 
     @PostMapping
     public ResponseEntity<TopicResponseDto> createTopic(@RequestBody TopicRegisterDto topicDto, HttpServletRequest request) {
@@ -51,16 +59,35 @@ public class TopicController {
         return ResponseEntity.ok().body(updatedTopicDto);
     }
 
-    @PostMapping("/{id}/favorite")
+    @PostMapping("/favorite/{id}")
     public ResponseEntity<FavoriteTopicResponseDto> favoriteTopicById(@PathVariable Long id, HttpServletRequest httpServletRequest) {
         FavoriteTopicResponseDto favoriteTopicDto = topicService.favoriteTopic(id, httpServletRequest);
         return ResponseEntity.ok().body(favoriteTopicDto);
     }
 
-    @PostMapping("/{id}/unfavorite")
+    @DeleteMapping("/unfavorite/{id}")
     public ResponseEntity<FavoriteTopicResponseDto> unfavoriteTopicById(@PathVariable Long id, HttpServletRequest httpServletRequest) {
-        FavoriteTopicResponseDto favoriteTopicDto = topicService.unfavoriteTopic(id, httpServletRequest);
-        return ResponseEntity.ok().body(favoriteTopicDto);
+        topicService.unfavoriteTopic(id, httpServletRequest);
+        return ResponseEntity.noContent().build();    }
+
+    @PostMapping("/like/{id}")
+    public ResponseEntity<LikeResponseDto> likeTopic(@PathVariable Long id, HttpServletRequest httpServletRequest){
+        String  token = tokenService.getTokenFromRequest(httpServletRequest);
+        LikeResponseDto like = topicService.likeTopic(id, token);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{topics}")
+                .buildAndExpand(like.getLikeId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(like);
+    }
+
+    @DeleteMapping("/unlike/{id}")
+    public ResponseEntity<Void> unlikeTopic(@PathVariable Long id, HttpServletRequest request) {
+        String token = tokenService.getTokenFromRequest(request);
+        topicService.unlikeTopic(id, token);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
@@ -68,4 +95,6 @@ public class TopicController {
         topicService.deleteTopic(id, request);
         return ResponseEntity.noContent().build();
     }
+
+
 }

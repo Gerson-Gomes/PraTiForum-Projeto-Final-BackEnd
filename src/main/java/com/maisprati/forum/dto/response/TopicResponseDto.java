@@ -12,12 +12,14 @@ public class TopicResponseDto {
     private Long id;
     private String title;
     private String content;
+    private int likes;
     private List<Long> tagIds;
 
     public TopicResponseDto(Topic topic){
         this.id = topic.getId();
         this.title = topic.getTitle();
         this.content = topic.getContent();
+        this.likes = topic.getLikes().size();
         this.tagIds = topic.getTags().stream().map(Tag::getId).collect(Collectors.toList());
     }
 }
