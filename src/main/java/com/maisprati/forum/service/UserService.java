@@ -34,11 +34,11 @@ public class UserService implements UserDetailsService {
         String token = tokenService.getTokenFromRequest(request);
         verifyToken(token);
 
-        String username = tokenService.extractUsername(token);
+        Long userId = tokenService.extractUserId(token);
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
-        User userToken = userRepository.findByUserName(username)
+        User userToken = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
         if (!id.equals(userToken.getId())) {

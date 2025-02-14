@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,8 +18,8 @@ public class UserProfileResponseDto {
     private String email;
     private String description;
     private LocalDate birthDate;
-    private LocalDateTime creationDate;
-    private LocalDateTime lastEditionDate;
+    private String creationDate;
+    private String lastEditionDate;
     private List<SocialMediaDto> socialMedia;
     private byte[] profilePicture;
 
@@ -29,8 +30,8 @@ public class UserProfileResponseDto {
         this.email = user.getEmail();
         this.description = user.getDescription();
         this.birthDate = user.getBirthDate();
-        this.creationDate = user.getCreationDate();
-        this.lastEditionDate = user.getLastEditionDate();
+        this.creationDate = formatDate(user.getCreationDate());
+        this.lastEditionDate = formatDate(user.getLastEditionDate());
         this.profilePicture = user.getProfilePicture();
 
         if (user.getUserSocialMidia() != null) {
@@ -43,5 +44,14 @@ public class UserProfileResponseDto {
                     ))
                     .collect(Collectors.toList());
         }
+    }
+
+    public String formatDate(LocalDateTime creationDate) {
+        if (creationDate == null){
+            return null;
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return creationDate.format(formatter);
     }
 }
