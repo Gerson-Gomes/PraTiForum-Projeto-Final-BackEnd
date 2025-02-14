@@ -12,6 +12,6 @@ public class UserUpdateDto {
     private String lastName;
     private String email;
     private String description;
-    private LocalDate birthDate;
+    private String birthDate;
     private List<SocialMediaDto> socialMedia;
 }

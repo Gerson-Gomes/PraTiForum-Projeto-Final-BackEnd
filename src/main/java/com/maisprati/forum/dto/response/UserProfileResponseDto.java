@@ -17,7 +17,7 @@ public class UserProfileResponseDto {
     private String lastName;
     private String email;
     private String description;
-    private LocalDate birthDate;
+    private String birthDate;
     private String creationDate;
     private String lastEditionDate;
     private List<SocialMediaDto> socialMedia;
@@ -29,7 +29,7 @@ public class UserProfileResponseDto {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.description = user.getDescription();
-        this.birthDate = user.getBirthDate();
+        this.birthDate = user.getBirthDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         this.creationDate = formatDate(user.getCreationDate());
         this.lastEditionDate = formatDate(user.getLastEditionDate());
         this.profilePicture = user.getProfilePicture();
