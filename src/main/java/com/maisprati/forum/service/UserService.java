@@ -6,6 +6,7 @@ import com.maisprati.forum.dto.response.UserProfileResponseDto;
 import com.maisprati.forum.dto.response.UserRegisterResponseDto;
 import com.maisprati.forum.exception.*;
 import com.maisprati.forum.model.User;
+import com.maisprati.forum.model.UserRole;
 import com.maisprati.forum.repository.UserRepository;
 import com.maisprati.forum.service.token.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,7 +47,7 @@ public class UserService implements UserDetailsService {
             throw new InvalidTokenException("Você só pode editar o seu próprio perfil.");
         }
 
-        // Atualizar informações básicas do usuário
+        // Atualizar informações baicas do usuario
         user.setFirstName(userUpdateDto.getFirstName());
         user.setLastName(userUpdateDto.getLastName());
         user.setEmail(userUpdateDto.getEmail());
@@ -106,6 +107,15 @@ public class UserService implements UserDetailsService {
         }
 
         return new UserRegisterResponseDto(userRepository.save(userDto.createUser(userDto, passwordEncoder)));
+    }
+
+    @Transactional
+    public User registerUserGoogle(User googleUser) {
+        if (userRepository.findByEmail(googleUser.getEmail()).isPresent()) {
+            return userRepository.findByEmail(googleUser.getEmail()).get();
+        }
+        googleUser.setRole(UserRole.USER);
+        return userRepository.save(googleUser);
     }
 
     @Transactional
