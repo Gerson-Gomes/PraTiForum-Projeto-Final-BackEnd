@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -32,8 +34,8 @@ public class TagController {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping
-    public ResponseEntity<List<TagDto>> getAllTags() {
-        List<TagDto> tagDtos = tagService.getAllTags();
+    public ResponseEntity<Page<TagDto>> getAllTags(Pageable pageable) {
+        Page<TagDto> tagDtos = tagService.getAllTags(pageable);
         return ResponseEntity.ok(tagDtos);
     }
 

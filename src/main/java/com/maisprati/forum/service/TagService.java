@@ -6,6 +6,8 @@ import com.maisprati.forum.exception.TagNotFoundException;
 import com.maisprati.forum.model.Tag;
 import com.maisprati.forum.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,10 +30,8 @@ public class TagService {
         return new TagDto(createdTag.getName());
     }
 
-    public List<TagDto> getAllTags() {
-        return tagRepository.findAll().stream()
-                .map(tag -> new TagDto(tag.getName()))
-                .collect(Collectors.toList());
+    public Page<TagDto> getAllTags(Pageable pageable) {
+        return tagRepository.findAll(pageable).map(tag -> new TagDto(tag.getName()));
     }
 
     public TagDto updateTag(Long id, TagDto tagDto) {

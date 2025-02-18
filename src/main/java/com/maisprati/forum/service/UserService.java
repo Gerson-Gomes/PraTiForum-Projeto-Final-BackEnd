@@ -11,6 +11,8 @@ import com.maisprati.forum.service.token.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,9 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -78,9 +77,9 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public List<UserProfileResponseDto> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return users.stream().map(UserProfileResponseDto::new).toList();
+    public Page<UserProfileResponseDto> getAllUsers(Pageable pageable) {
+        Page<User> users = userRepository.findAll(pageable);
+        return users.map(UserProfileResponseDto::new);
     }
 
     @Transactional
