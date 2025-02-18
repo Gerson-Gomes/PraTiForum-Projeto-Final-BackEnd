@@ -1,7 +1,7 @@
 package com.maisprati.forum.config;
 
 import com.maisprati.forum.service.UserService;
-import com.maisprati.forum.service.token.TokenService;
+import com.maisprati.forum.utils.TokenService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,12 +32,17 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain chain)
             throws ServletException, IOException {
-        String token = recoverToken(request);
 
-        if (request.getServletPath().startsWith("/api/auth")) {
+        String requestURI = request.getRequestURI();
+
+        if (requestURI.startsWith("/v3/api-docs") ||
+                requestURI.startsWith("/swagger-ui") ||
+                requestURI.startsWith("/actuator")) {
             chain.doFilter(request, response);
             return;
         }
+
+        String token = recoverToken(request);
 
         try {
             if (token != null ) {

@@ -7,7 +7,7 @@ import com.maisprati.forum.model.Topic;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.repository.TopicRepository;
 import com.maisprati.forum.repository.UserRepository;
-import com.maisprati.forum.service.token.TokenService;
+import com.maisprati.forum.utils.TokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

@@ -45,3 +45,4 @@ springdoc:
   api-docs:
     path: /v3/api-docs
   default-produces-media-type: application/json
+

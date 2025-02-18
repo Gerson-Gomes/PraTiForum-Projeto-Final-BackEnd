@@ -7,7 +7,7 @@ import com.maisprati.forum.dto.response.UserRegisterResponseDto;
 import com.maisprati.forum.exception.*;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.repository.UserRepository;
-import com.maisprati.forum.service.token.TokenService;
+import com.maisprati.forum.utils.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -33,7 +31,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public UserProfileResponseDto editUser(Long id, UserUpdateDto userUpdateDto, HttpServletRequest request) {
-        String token = getTokenFromRequest(request);
+        String token = tokenService.getTokenFromRequest(request);
         verifyToken(token);
 
         String username = tokenService.extractUsername(token);
@@ -61,7 +59,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void deleteUser(Long id, HttpServletRequest request) {
-        String token = getTokenFromRequest(request);
+        String token = tokenService.getTokenFromRequest(request);
         verifyToken(token);
 
         String username = tokenService.extractUsername(token);
@@ -71,7 +69,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
         if (!id.equals(userToken.getId())) {
-            throw new InvalidTokenException("Você só pode deletar o seu próprio perfil.");
+            throw new TokenInvalidExpection("Você só pode deletar o seu próprio perfil.");
         }
 
         userRepository.delete(user);
@@ -122,17 +120,9 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    private String getTokenFromRequest(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
-        }
-        throw new InvalidTokenException("Token não fornecido ou inválido.");
-    }
-
     private static void verifyToken(String token) {
         if (token == null || token.isEmpty()) {
-            throw new InvalidTokenException("Token inválido.");
+            throw new TokenInvalidExpection("Token inválido.");
         }
     }
 
