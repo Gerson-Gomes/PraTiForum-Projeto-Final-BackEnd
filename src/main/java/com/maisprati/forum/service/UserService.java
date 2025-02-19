@@ -17,7 +17,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,11 +36,11 @@ public class UserService implements UserDetailsService {
         String token = tokenService.getTokenFromRequest(request);
         verifyToken(token);
 
-        String username = tokenService.extractUsername(token);
+        Long userId = tokenService.extractUserId(token);
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
-        User userToken = userRepository.findByUserName(username)
+        User userToken = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
         if (!id.equals(userToken.getId())) {
@@ -51,7 +53,7 @@ public class UserService implements UserDetailsService {
         user.setEmail(userUpdateDto.getEmail());
         user.setUserName(userUpdateDto.getEmail());
         user.setDescription(userUpdateDto.getDescription());
-        user.setBirthDate(userUpdateDto.getBirthDate());
+        user.setBirthDate(LocalDate.parse(userUpdateDto.getBirthDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         user.setLastEditionDate(LocalDateTime.now());
 
         return new UserProfileResponseDto(userRepository.save(user));
