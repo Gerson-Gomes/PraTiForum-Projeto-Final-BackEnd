@@ -8,7 +8,9 @@ import com.maisprati.forum.model.Like;
 import com.maisprati.forum.service.TopicService;
 import com.maisprati.forum.service.UserService;
 import com.maisprati.forum.utils.TokenService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,10 +42,19 @@ public class TopicController {
         return ResponseEntity.created(location).body(createdTopicDto);
     }
 
+    @Operation(
+            summary = "Lista tópicos paginados",
+            description = "Retorna uma lista paginada de tópicos.\n\n" +
+                    "Parâmetros de consulta:\n" +
+                    "- **page**: Número da página (inicia em 0). Exemplo: 0\n" +
+                    "- **size**: Quantidade de registros por página. Exemplo: 10\n" +
+                    "- **sort**: Critério de ordenação no formato `campo,direction`, onde `direction` pode ser `asc` ou `desc`. Exemplo: `title,asc`"
+    )
     @GetMapping
-    public ResponseEntity<Page<TopicResponseDto>> getAllTopics(Pageable pageable) {
+    public ResponseEntity<Page<TopicResponseDto>> getAllTopics(
+            @ParameterObject Pageable pageable) {
         Page<TopicResponseDto> topicDtos = topicService.getAllTopics(pageable);
-        return ResponseEntity.ok().body(topicDtos);
+        return ResponseEntity.ok(topicDtos);
     }
 
     @GetMapping("/{id}")
