@@ -10,12 +10,13 @@ import com.maisprati.forum.service.UserService;
 import com.maisprati.forum.utils.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/topics")
@@ -40,8 +41,8 @@ public class TopicController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TopicResponseDto>> getAllTopics() {
-        List<TopicResponseDto> topicDtos = topicService.getAllTopics();
+    public ResponseEntity<Page<TopicResponseDto>> getAllTopics(Pageable pageable) {
+        Page<TopicResponseDto> topicDtos = topicService.getAllTopics(pageable);
         return ResponseEntity.ok().body(topicDtos);
     }
 

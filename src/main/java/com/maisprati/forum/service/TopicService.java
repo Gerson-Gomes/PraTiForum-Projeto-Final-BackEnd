@@ -11,6 +11,8 @@ import com.maisprati.forum.utils.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -53,10 +55,8 @@ public class TopicService {
     }
 
     @Transactional
-    public List<TopicResponseDto> getAllTopics() {
-        return topicRepository.findAll().stream()
-                .map(TopicResponseDto::new)
-                .collect(Collectors.toList());
+    public Page<TopicResponseDto> getAllTopics(Pageable pageable) {
+        return topicRepository.findAll(pageable).map(TopicResponseDto::new);
     }
 
     @Transactional

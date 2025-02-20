@@ -6,11 +6,14 @@ import com.maisprati.forum.dto.response.UserProfileResponseDto;
 import com.maisprati.forum.dto.response.UserRegisterResponseDto;
 import com.maisprati.forum.exception.*;
 import com.maisprati.forum.model.User;
+import com.maisprati.forum.model.UserRole;
 import com.maisprati.forum.repository.UserRepository;
 import com.maisprati.forum.utils.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -47,7 +49,7 @@ public class UserService implements UserDetailsService {
             throw new InvalidTokenException("Você só pode editar o seu próprio perfil.");
         }
 
-        // Atualizar informações básicas do usuário
+        // Atualizar informações baicas do usuario
         user.setFirstName(userUpdateDto.getFirstName());
         user.setLastName(userUpdateDto.getLastName());
         user.setEmail(userUpdateDto.getEmail());
@@ -78,9 +80,9 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public List<UserProfileResponseDto> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return users.stream().map(UserProfileResponseDto::new).toList();
+    public Page<UserProfileResponseDto> getAllUsers(Pageable pageable) {
+        Page<User> users = userRepository.findAll(pageable);
+        return users.map(UserProfileResponseDto::new);
     }
 
     @Transactional
@@ -107,6 +109,15 @@ public class UserService implements UserDetailsService {
         }
 
         return new UserRegisterResponseDto(userRepository.save(userDto.createUser(userDto, passwordEncoder)));
+    }
+
+    @Transactional
+    public User registerUserGoogle(User googleUser) {
+        if (userRepository.findByEmail(googleUser.getEmail()).isPresent()) {
+            return userRepository.findByEmail(googleUser.getEmail()).get();
+        }
+        googleUser.setRole(UserRole.USER);
+        return userRepository.save(googleUser);
     }
 
     @Transactional

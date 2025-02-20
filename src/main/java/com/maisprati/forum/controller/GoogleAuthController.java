@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -61,11 +60,11 @@ public class GoogleAuthController {
         String refreshToken = tokens.get("refresh_token");
 
         User googleUser = googleTokenVerifier.verifyToken(accessToken);
+        User registeredUser = userService.registerUserGoogle(googleUser);
 
-        userService.storeRefreshToken(googleUser.getEmail(), refreshToken);
+        userService.storeRefreshToken(registeredUser.getEmail(), refreshToken);
 
-        // Gerando o JWT incluindo o email e o ID do usuário
-        String jwt = tokenService.generateToken(googleUser.getEmail(), googleUser.getId());
-        return ResponseEntity.ok(new LoginResponseDto(jwt, UserRole.USER));
+        String jwt = tokenService.generateToken(registeredUser.getEmail(), registeredUser.getId());
+        return ResponseEntity.ok(new LoginResponseDto(jwt, registeredUser.getRole()));
     }
 }

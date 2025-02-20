@@ -5,10 +5,10 @@ import com.maisprati.forum.dto.response.UserProfileResponseDto;
 import com.maisprati.forum.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -18,8 +18,8 @@ public class UserController {
     UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserProfileResponseDto>> getAllUsers() {
-        List<UserProfileResponseDto> users = userService.getAllUsers();
+    public ResponseEntity<Page<UserProfileResponseDto>> getAllUsers(Pageable pageable) {
+        Page<UserProfileResponseDto> users = userService.getAllUsers(pageable);
         return ResponseEntity.ok().body(users);
     }
 

@@ -1,6 +1,5 @@
 package com.maisprati.forum.model;
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Data;
@@ -21,6 +20,7 @@ public class Forum {
 
     @NotNull
     private String name;
+
+    // Adicionando o campo description
+    private String description;
 }
-
-

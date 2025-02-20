@@ -13,12 +13,12 @@ spring:
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         show-sql: true
-
   security:
     oauth2:
       client:
@@ -45,4 +45,3 @@ springdoc:
   api-docs:
     path: /v3/api-docs
   default-produces-media-type: application/json
-
