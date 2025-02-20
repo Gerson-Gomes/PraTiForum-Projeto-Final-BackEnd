@@ -8,7 +8,7 @@ import com.maisprati.forum.exception.*;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.model.UserRole;
 import com.maisprati.forum.repository.UserRepository;
-import com.maisprati.forum.service.token.TokenService;
+import com.maisprati.forum.utils.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
