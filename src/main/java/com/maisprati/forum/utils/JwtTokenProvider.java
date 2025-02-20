@@ -1,4 +1,4 @@
-package com.maisprati.forum.service.token;
+package com.maisprati.forum.utils;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

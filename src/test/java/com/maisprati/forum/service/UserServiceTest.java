@@ -5,13 +5,12 @@ import com.maisprati.forum.exception.UserAlreadyExistsException;
 import com.maisprati.forum.exception.UserNotFoundException;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.repository.UserRepository;
-import com.maisprati.forum.service.token.TokenService;
+import com.maisprati.forum.utils.TokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;

@@ -5,7 +5,7 @@ import com.maisprati.forum.dto.response.LoginResponseDto;
 import com.maisprati.forum.dto.request.UserRegisterDto;
 import com.maisprati.forum.model.User;
 import com.maisprati.forum.service.UserService;
-import com.maisprati.forum.service.token.TokenService;
+import com.maisprati.forum.utils.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
