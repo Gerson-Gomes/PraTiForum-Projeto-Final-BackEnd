@@ -22,4 +22,12 @@ public class TopicResponseDto {
         this.likes = topic.getLikes().size();
         this.tagIds = topic.getTags().stream().map(Tag::getId).collect(Collectors.toList());
     }
+
+    public Topic toTopic() {
+        Topic topic = new Topic();
+        topic.setId(this.getId());
+        topic.setTitle(this.getTitle());
+        topic.setContent(this.getContent());
+        return topic;
+    }
 }
