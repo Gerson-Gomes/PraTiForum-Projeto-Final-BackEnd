@@ -29,9 +29,10 @@ public class UserProfileResponseDto {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.description = user.getDescription();
-        this.birthDate = user.getBirthDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        this.birthDate = formatBirthDate(user.getBirthDate());
         this.creationDate = formatDate(user.getCreationDate());
         this.lastEditionDate = formatDate(user.getLastEditionDate());
+
         this.profilePicture = user.getProfilePicture();
 
         if (user.getUserSocialMidia() != null) {
@@ -46,12 +47,19 @@ public class UserProfileResponseDto {
         }
     }
 
-    public String formatDate(LocalDateTime creationDate) {
-        if (creationDate == null){
+    private String formatBirthDate(LocalDate birthDate) {
+        if (birthDate == null) {
             return null;
         }
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return creationDate.format(formatter);
+        return birthDate.format(formatter);
+    }
+
+    private String formatDate(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return dateTime.format(formatter);
     }
 }
