@@ -2,14 +2,16 @@ package com.maisprati.forum.controller;
 
 import com.maisprati.forum.dto.TagDto;
 import com.maisprati.forum.service.TagService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/tags")
@@ -32,9 +34,15 @@ public class TagController {
         return ResponseEntity.ok(tagDto);
     }
 
+    @Operation(summary = "Obter todas as tags com paginação",
+            description = "Retorna uma lista paginada de tags.",
+            parameters = {
+                    @Parameter(name = "page", description = "Número da página (inicia em 0)", schema = @Schema(type = "integer", defaultValue = "0")),
+                    @Parameter(name = "size", description = "Quantidade de registros por página", schema = @Schema(type = "integer", defaultValue = "10"))
+            })
     @PreAuthorize("hasRole('USER')")
     @GetMapping
-    public ResponseEntity<Page<TagDto>> getAllTags(Pageable pageable) {
+    public ResponseEntity<Page<TagDto>> getAllTags(@ParameterObject Pageable pageable) {
         Page<TagDto> tagDtos = tagService.getAllTags(pageable);
         return ResponseEntity.ok(tagDtos);
     }

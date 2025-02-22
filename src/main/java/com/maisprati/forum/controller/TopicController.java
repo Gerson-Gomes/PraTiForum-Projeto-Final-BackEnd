@@ -4,10 +4,13 @@ import com.maisprati.forum.dto.response.LikeResponseDto;
 import com.maisprati.forum.dto.response.TopicResponseDto;
 import com.maisprati.forum.dto.request.TopicRegisterDto;
 import com.maisprati.forum.dto.response.FavoriteTopicResponseDto;
-import com.maisprati.forum.model.Like;
 import com.maisprati.forum.service.TopicService;
 import com.maisprati.forum.service.UserService;
 import com.maisprati.forum.utils.TokenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springdoc.core.annotations.ParameterObject;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,8 +27,10 @@ public class TopicController {
 
     @Autowired
     private TopicService topicService;
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private TokenService tokenService;
 
@@ -40,8 +45,14 @@ public class TopicController {
         return ResponseEntity.created(location).body(createdTopicDto);
     }
 
+    @Operation(summary = "Obter todos os tópicos com paginação",
+            description = "Retorna uma lista paginada de tópicos.",
+            parameters = {
+                    @Parameter(name = "page", description = "Número da página (inicia em 0)", schema = @Schema(type = "integer", defaultValue = "0")),
+                    @Parameter(name = "size", description = "Quantidade de registros por página", schema = @Schema(type = "integer", defaultValue = "10"))
+            })
     @GetMapping
-    public ResponseEntity<Page<TopicResponseDto>> getAllTopics(Pageable pageable) {
+    public ResponseEntity<Page<TopicResponseDto>> getAllTopics(@ParameterObject Pageable pageable) {
         Page<TopicResponseDto> topicDtos = topicService.getAllTopics(pageable);
         return ResponseEntity.ok().body(topicDtos);
     }
@@ -69,11 +80,12 @@ public class TopicController {
     @DeleteMapping("/unfavorite/{id}")
     public ResponseEntity<FavoriteTopicResponseDto> unfavoriteTopicById(@PathVariable Long id, HttpServletRequest httpServletRequest) {
         topicService.unfavoriteTopic(id, httpServletRequest);
-        return ResponseEntity.noContent().build();    }
+        return ResponseEntity.noContent().build();
+    }
 
     @PostMapping("/like/{id}")
     public ResponseEntity<LikeResponseDto> likeTopic(@PathVariable Long id, HttpServletRequest httpServletRequest){
-        String  token = tokenService.getTokenFromRequest(httpServletRequest);
+        String token = tokenService.getTokenFromRequest(httpServletRequest);
         LikeResponseDto like = topicService.likeTopic(id, token);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -96,6 +108,4 @@ public class TopicController {
         topicService.deleteTopic(id, request);
         return ResponseEntity.noContent().build();
     }
-
-
 }

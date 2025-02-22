@@ -3,6 +3,10 @@ package com.maisprati.forum.controller;
 import com.maisprati.forum.dto.request.UserUpdateDto;
 import com.maisprati.forum.dto.response.UserProfileResponseDto;
 import com.maisprati.forum.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springdoc.core.annotations.ParameterObject;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,8 +21,14 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @Operation(summary = "Obter todos os usuários com paginação",
+            description = "Retorna uma lista paginada de perfis de usuários.",
+            parameters = {
+                    @Parameter(name = "page", description = "Número da página (inicia em 0)", schema = @Schema(type = "integer", defaultValue = "0")),
+                    @Parameter(name = "size", description = "Quantidade de registros por página", schema = @Schema(type = "integer", defaultValue = "10"))
+            })
     @GetMapping
-    public ResponseEntity<Page<UserProfileResponseDto>> getAllUsers(Pageable pageable) {
+    public ResponseEntity<Page<UserProfileResponseDto>> getAllUsers(@ParameterObject Pageable pageable) {
         Page<UserProfileResponseDto> users = userService.getAllUsers(pageable);
         return ResponseEntity.ok().body(users);
     }
