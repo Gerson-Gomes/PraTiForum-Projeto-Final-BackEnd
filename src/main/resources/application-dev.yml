@@ -19,6 +19,7 @@ spring:
     properties:
       hibernate:
         show-sql: true
+
   security:
     oauth2:
       client:
@@ -36,6 +37,7 @@ spring:
 jwt:
   secret: ${SECRET_JWT}
   expiration: 3600000
+  refreshExpiration: 86400000 # 24 horas em milissegundos
 
 springdoc:
   swagger-ui:
@@ -45,3 +47,12 @@ springdoc:
   api-docs:
     path: /v3/api-docs
   default-produces-media-type: application/json
+  schemes: [http, https]  # Adiciona suporte a HTTP e HTTPS
+
+# Configuração do nível de log
+logging.level.root: INFO
+logging.level.org.springframework.web: DEBUG
+logging.level.com.maisprati.forum: DEBUG
+
+# Definição do arquivo de log
+logging.file.name: logs/application-dev.log

@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -21,8 +22,11 @@ public class TokenServiceTest {
 
     @BeforeEach
     public void setUp() {
+        tokenService = new TokenService();
         signingKey = Keys.hmacShaKeyFor("secret-key".getBytes(StandardCharsets.UTF_8));
-        tokenService = new TokenService("secret-key");
+        ReflectionTestUtils.setField(tokenService, "jwtSecret", "secret-key");
+        ReflectionTestUtils.setField(tokenService, "jwtExpirationInMs", 3600000);
+        ReflectionTestUtils.setField(tokenService, "jwtRefreshExpirationInMs", 86400000); // 24 horas
     }
 
     @Test

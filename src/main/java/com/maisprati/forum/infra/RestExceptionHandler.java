@@ -84,9 +84,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<String> handleUserAlreadyLikedTopicException(UserAlreadyLikedTopicException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
+
     @ExceptionHandler(UserHasNotLikedTopicException.class)
     public ResponseEntity<String> handleUserNotLikedTopicException(UserHasNotLikedTopicException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
-}
 
+    @ExceptionHandler(OAuth2AuthenticationException.class)
+    public ResponseEntity<String> handleOAuth2AuthenticationException(OAuth2AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("OAuth2 Authentication Failed: " + ex.getMessage());
+
+
+    }
+
+}
