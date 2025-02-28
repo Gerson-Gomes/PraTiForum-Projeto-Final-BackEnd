@@ -16,35 +16,34 @@ import java.util.function.Function;
 @Service
 public class TokenService {
 
-    @Value("${jwt.secret}")
     private String secret;
 
-    /**
-     * Gera uma chave de assinatura com o segredo
-     * @return
-     */
+    public TokenService() {
+        // Default constructor required for Spring
+    }
+
+    public TokenService(String secret) {
+        this.secret = secret;
+    }
+
+    @Value("${jwt.secret}")
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    /**
-     * Extrai o username (subject) de um token JWT.
-     */
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    /**
-     * Extrai um claim genérico do token usando uma função fornecida.
-     */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    /**
-     * Extrai todos os claims de um token JWT.
-     */
     private Claims extractAllClaims(String token) {
         try {
             return Jwts.parserBuilder()
@@ -59,51 +58,33 @@ public class TokenService {
         }
     }
 
-    /**
-     * Gera um token JWT para um usuário.
-     */
     public String generateToken(String username, Long userId) {
         return Jwts.builder()
-                .setSubject(username) // Define o "subject" (nome do usuário)
-                .claim("userId", userId) // Adiciona o ID do usuário como claim
-                .setIssuedAt(new Date()) // Data de emissão
+                .setSubject(username)
+                .claim("userId", userId)
+                .setIssuedAt(new Date())
                 .setExpiration(generateExpirationDate())
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256) // Assina o token
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    /**
-     * Valida o token JWT.
-     */
     public boolean validateToken(String token, String username) {
         final String extractedUsername = extractUsername(token);
         return extractedUsername.equals(username) && !isTokenExpired(token);
     }
 
-    /**
-     * Verifica se o token está expirado.
-     */
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    /**
-     * Extrai a data de expiração do token.
-     */
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    /**
-     Método para gerar a data de expiração (20 minutos)
-     */
     private Date generateExpirationDate() {
         return new Date(System.currentTimeMillis() + calculateExpirationInMillis());
     }
 
-    /**
-     Metodo para calcular data de expiração
-     */
     private long calculateExpirationInMillis() {
         return 1000 * 60 * 20; // 20 minutos em milissegundos
     }
@@ -118,5 +99,10 @@ public class TokenService {
 
     public Long extractUserId(String token) {
         return extractClaim(token, claims -> claims.get("userId", Long.class));
+    }
+
+    // Método público de apoio para testes
+    public Claims extractAllClaimsForTest(String token) {
+        return extractAllClaims(token);
     }
 }

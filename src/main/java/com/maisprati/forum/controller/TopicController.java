@@ -26,8 +26,10 @@ public class TopicController {
 
     @Autowired
     private TopicService topicService;
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private TokenService tokenService;
 
@@ -80,11 +82,12 @@ public class TopicController {
     @DeleteMapping("/unfavorite/{id}")
     public ResponseEntity<FavoriteTopicResponseDto> unfavoriteTopicById(@PathVariable Long id, HttpServletRequest httpServletRequest) {
         topicService.unfavoriteTopic(id, httpServletRequest);
-        return ResponseEntity.noContent().build();    }
+        return ResponseEntity.noContent().build();
+    }
 
     @PostMapping("/like/{id}")
     public ResponseEntity<LikeResponseDto> likeTopic(@PathVariable Long id, HttpServletRequest httpServletRequest){
-        String  token = tokenService.getTokenFromRequest(httpServletRequest);
+        String token = tokenService.getTokenFromRequest(httpServletRequest);
         LikeResponseDto like = topicService.likeTopic(id, token);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -107,6 +110,4 @@ public class TopicController {
         topicService.deleteTopic(id, request);
         return ResponseEntity.noContent().build();
     }
-
-
 }

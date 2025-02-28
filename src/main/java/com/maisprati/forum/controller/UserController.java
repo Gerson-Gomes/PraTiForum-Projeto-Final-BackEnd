@@ -37,6 +37,7 @@ public class UserController {
         Page<UserProfileResponseDto> users = userService.getAllUsers(pageable);
         return ResponseEntity.ok(users);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<UserProfileResponseDto> getUserById(@PathVariable Long id) {
         UserProfileResponseDto user = userService.getUserById(id);
