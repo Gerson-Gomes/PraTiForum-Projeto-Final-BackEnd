@@ -190,4 +190,8 @@ public class TopicService {
 
         return ResponseEntity.ok("Resposta adicionada com sucesso!");
     }
+
+    public Optional<Topic> findTopicById(Long id) {
+        return topicRepository.findById(id);
+    }
 }

@@ -4,15 +4,17 @@ import com.maisprati.forum.dto.request.UserUpdateDto;
 import com.maisprati.forum.dto.response.UserProfileResponseDto;
 import com.maisprati.forum.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import org.springdoc.core.annotations.ParameterObject;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -21,16 +23,19 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @Operation(summary = "Obter todos os usuários com paginação",
-            description = "Retorna uma lista paginada de perfis de usuários.",
-            parameters = {
-                    @Parameter(name = "page", description = "Número da página (inicia em 0)", schema = @Schema(type = "integer", defaultValue = "0")),
-                    @Parameter(name = "size", description = "Quantidade de registros por página", schema = @Schema(type = "integer", defaultValue = "10"))
-            })
+    @Operation(
+            summary = "Lista usuários paginados",
+            description = "Retorna uma lista paginada de usuários. " +
+                    "Parâmetros de consulta:\n" +
+                    "- **page**: Número da página (inicia em 0). Exemplo: 0\n" +
+                    "- **size**: Quantidade de registros por página. Exemplo: 10\n" +
+                    "- **sort**: Critério de ordenação no formato `campo,direction`, onde `direction` pode ser `asc` ou `desc`. Exemplo: `firstName,asc`"
+    )
     @GetMapping
-    public ResponseEntity<Page<UserProfileResponseDto>> getAllUsers(@ParameterObject Pageable pageable) {
+    public ResponseEntity<Page<UserProfileResponseDto>> getAllUsers(
+            @ParameterObject Pageable pageable) {
         Page<UserProfileResponseDto> users = userService.getAllUsers(pageable);
-        return ResponseEntity.ok().body(users);
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")

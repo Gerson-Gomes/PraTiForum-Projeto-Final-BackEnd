@@ -4,14 +4,13 @@ import com.maisprati.forum.dto.response.LikeResponseDto;
 import com.maisprati.forum.dto.response.TopicResponseDto;
 import com.maisprati.forum.dto.request.TopicRegisterDto;
 import com.maisprati.forum.dto.response.FavoriteTopicResponseDto;
+import com.maisprati.forum.model.Like;
 import com.maisprati.forum.service.TopicService;
 import com.maisprati.forum.service.UserService;
 import com.maisprati.forum.utils.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import org.springdoc.core.annotations.ParameterObject;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,16 +44,19 @@ public class TopicController {
         return ResponseEntity.created(location).body(createdTopicDto);
     }
 
-    @Operation(summary = "Obter todos os tópicos com paginação",
-            description = "Retorna uma lista paginada de tópicos.",
-            parameters = {
-                    @Parameter(name = "page", description = "Número da página (inicia em 0)", schema = @Schema(type = "integer", defaultValue = "0")),
-                    @Parameter(name = "size", description = "Quantidade de registros por página", schema = @Schema(type = "integer", defaultValue = "10"))
-            })
+    @Operation(
+            summary = "Lista tópicos paginados",
+            description = "Retorna uma lista paginada de tópicos.\n\n" +
+                    "Parâmetros de consulta:\n" +
+                    "- **page**: Número da página (inicia em 0). Exemplo: 0\n" +
+                    "- **size**: Quantidade de registros por página. Exemplo: 10\n" +
+                    "- **sort**: Critério de ordenação no formato `campo,direction`, onde `direction` pode ser `asc` ou `desc`. Exemplo: `title,asc`"
+    )
     @GetMapping
-    public ResponseEntity<Page<TopicResponseDto>> getAllTopics(@ParameterObject Pageable pageable) {
+    public ResponseEntity<Page<TopicResponseDto>> getAllTopics(
+            @ParameterObject Pageable pageable) {
         Page<TopicResponseDto> topicDtos = topicService.getAllTopics(pageable);
-        return ResponseEntity.ok().body(topicDtos);
+        return ResponseEntity.ok(topicDtos);
     }
 
     @GetMapping("/{id}")
