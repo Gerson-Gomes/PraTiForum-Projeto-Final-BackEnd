@@ -6,7 +6,7 @@ spring:
     name: maispratiforum
 
   datasource:
-    url: jdbc:postgresql://${HOST}:${PORT}/${DATA_BASE}
+    url: jdbc:${HOST}:${PORT}/${DATA_BASE}
     username: ${USER}
     password: ${PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -36,7 +36,6 @@ spring:
 jwt:
   secret: ${SECRET_JWT}
   expiration: 3600000
-  refreshExpiration: 86400000 # 24 horas em milissegundos
 
 springdoc:
   swagger-ui:
@@ -46,13 +45,3 @@ springdoc:
   api-docs:
     path: /v3/api-docs
   default-produces-media-type: application/json
-  schemes: [http, https]  # Adiciona suporte a HTTP e HTTPS
-
-# Configuração do nível de log
-logging:
-  level:
-    root: INFO
-    org.springframework.web: DEBUG
-    com.maisprati.forum: DEBUG
-  file:
-    name: logs/application.log
