@@ -16,23 +16,17 @@ import java.util.function.Function;
 @Service
 public class TokenService {
 
-    private String secret;
-
-    public TokenService() {
-        // Default constructor required for Spring
-    }
-
-    public TokenService(String secret) {
-        this.secret = secret;
-    }
-
     @Value("${jwt.secret}")
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
+    private String jwtSecret;
+
+    @Value("${jwt.expiration}")
+    private int jwtExpirationInMs;
+
+    @Value("${jwt.refreshExpiration}")
+    private int jwtRefreshExpirationInMs;
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String extractUsername(String token) {
@@ -68,6 +62,15 @@ public class TokenService {
                 .compact();
     }
 
+    public String generateRefreshToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(generateRefreshExpirationDate())
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     public boolean validateToken(String token, String username) {
         final String extractedUsername = extractUsername(token);
         return extractedUsername.equals(username) && !isTokenExpired(token);
@@ -82,11 +85,11 @@ public class TokenService {
     }
 
     private Date generateExpirationDate() {
-        return new Date(System.currentTimeMillis() + calculateExpirationInMillis());
+        return new Date(System.currentTimeMillis() + jwtExpirationInMs);
     }
 
-    private long calculateExpirationInMillis() {
-        return 1000 * 60 * 20; // 20 minutos em milissegundos
+    private Date generateRefreshExpirationDate() {
+        return new Date(System.currentTimeMillis() + jwtRefreshExpirationInMs);
     }
 
     public String getTokenFromRequest(HttpServletRequest request) {
