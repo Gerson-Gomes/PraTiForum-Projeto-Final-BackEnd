@@ -53,10 +53,12 @@ public class UserService implements UserDetailsService {
         user.setFirstName(userUpdateDto.getFirstName());
         user.setLastName(userUpdateDto.getLastName());
         user.setEmail(userUpdateDto.getEmail());
+        user.setLocation(userUpdateDto.getLocation());
         user.setUserName(userUpdateDto.getEmail());
         user.setDescription(userUpdateDto.getDescription());
         user.setBirthDate(LocalDate.parse(userUpdateDto.getBirthDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         user.setLastEditionDate(LocalDateTime.now());
+        user.setUserSocialMidia(userUpdateDto.toUserSocialMidia());
 
         return new UserProfileResponseDto(userRepository.save(user));
     }

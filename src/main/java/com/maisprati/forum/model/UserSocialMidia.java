@@ -32,7 +32,14 @@ public class UserSocialMidia {
     @Column(name = "instagram_profile")
     private String instagramProfile;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public UserSocialMidia(String gitProfile, String discordProfile, String linkedinProfile, String instagramProfile) {
+        this.gitProfile = gitProfile;
+        this.discordProfile = discordProfile;
+        this.linkedinProfile = linkedinProfile;
+        this.instagramProfile = instagramProfile;
+    }
 }

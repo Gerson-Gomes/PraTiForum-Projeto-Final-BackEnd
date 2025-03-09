@@ -61,6 +61,9 @@ public class User implements UserDetails {
     @Column(name = "last_edition_date")
     private LocalDateTime lastEditionDate;
 
+    @Column(name = "location", nullable = true)
+    private String location;
+
     @Column(name = "profile_picture")
     private byte[] profilePicture;
 
@@ -76,8 +79,8 @@ public class User implements UserDetails {
     private List<Topic> topics;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserSocialMidia> userSocialMidia;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserSocialMidia userSocialMidia;
 
     @ToString.Exclude
     @ManyToMany(mappedBy = "usersWhoFavorited")

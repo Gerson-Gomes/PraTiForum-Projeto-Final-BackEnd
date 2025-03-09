@@ -20,7 +20,7 @@ public class UserProfileResponseDto {
     private String birthDate;
     private String creationDate;
     private String lastEditionDate;
-    private List<SocialMediaDto> socialMedia;
+    private SocialMediaDto socialMedia;
     private byte[] profilePicture;
 
     public UserProfileResponseDto(User user) {
@@ -32,19 +32,12 @@ public class UserProfileResponseDto {
         this.birthDate = formatBirthDate(user.getBirthDate());
         this.creationDate = formatDate(user.getCreationDate());
         this.lastEditionDate = formatDate(user.getLastEditionDate());
-
         this.profilePicture = user.getProfilePicture();
-
-        if (user.getUserSocialMidia() != null) {
-            this.socialMedia = user.getUserSocialMidia().stream()
-                    .map(sm -> new SocialMediaDto(
-                            sm.getGitProfile(),
-                            sm.getDiscordProfile(),
-                            sm.getLinkedinProfile(),
-                            sm.getInstagramProfile()
-                    ))
-                    .collect(Collectors.toList());
-        }
+        this.socialMedia = new SocialMediaDto(
+                user.getUserSocialMidia().getGitProfile(),
+                user.getUserSocialMidia().getDiscordProfile(),
+                user.getUserSocialMidia().getLinkedinProfile(),
+                user.getUserSocialMidia().getInstagramProfile());
     }
 
     private String formatBirthDate(LocalDate birthDate) {
