@@ -19,7 +19,7 @@ public class TopicResponseDto {
         this.id = topic.getId();
         this.title = topic.getTitle();
         this.content = topic.getContent();
-        this.likes = topic.getLikes().size();
+        this.likes = topic.getLikes() != null ? topic.getLikes().size() : 0;
         this.tagIds = topic.getTags().stream().map(Tag::getId).collect(Collectors.toList());
     }
 

@@ -40,7 +40,7 @@ public class TopicService {
         User user = userRepository.findByUserName(tokenService.extractUsername(token))
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
 
-        Tag tag = tagRepository.findById(topicDto.getTadId())
+        Tag tag = tagRepository.findById(topicDto.getTagId())
                 .orElseThrow(() -> new TagNotFoundException("Tag não encontrada."));
 
         Topic topic = new Topic();
@@ -86,7 +86,7 @@ public class TopicService {
             existingTopic.setContent(topicRegisterDto.getContent());
         }
 
-        Optional<Long> tagId = Optional.ofNullable(topicRegisterDto.getTadId());
+        Optional<Long> tagId = Optional.ofNullable(topicRegisterDto.getTagId());
         List<Tag> tags = tagId.map(id -> tagRepository.findById(id)
                         .orElseThrow(() -> new TagNotFoundException("Tag não encontrada com id: " + id)))
                 .map(Collections::singletonList)
