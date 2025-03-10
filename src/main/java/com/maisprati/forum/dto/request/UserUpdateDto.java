@@ -16,13 +16,13 @@ public class UserUpdateDto {
     private String birthDate;
     private String location;
     private SocialMediaDto socialMedia;
+    private String profilePicture;
 
     public UserSocialMidia toUserSocialMidia(){
         return new UserSocialMidia(
                 this.socialMedia.getGitProfile(),
-                this.socialMedia.getDiscordProfile(),
-                this.socialMedia.getLinkedinProfile(),
-                this.socialMedia.getInstagramProfile());
+                this.socialMedia.getInstagramProfile(),
+                this.socialMedia.getLinkedinProfile());
 
     }
 }

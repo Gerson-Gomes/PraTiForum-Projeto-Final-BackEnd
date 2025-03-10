@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.Optional;
 
 @Service
@@ -56,9 +57,23 @@ public class UserService implements UserDetailsService {
         user.setLocation(userUpdateDto.getLocation());
         user.setUserName(userUpdateDto.getEmail());
         user.setDescription(userUpdateDto.getDescription());
-        user.setBirthDate(LocalDate.parse(userUpdateDto.getBirthDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
+        if(userUpdateDto.getBirthDate() != null){
+            user.setBirthDate(LocalDate.parse(userUpdateDto.getBirthDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        }
         user.setLastEditionDate(LocalDateTime.now());
         user.setUserSocialMidia(userUpdateDto.toUserSocialMidia());
+        user.getUserSocialMidia().setUser(user);
+
+        if (userUpdateDto.getProfilePicture() != null && !userUpdateDto.getProfilePicture().isEmpty()) {
+            String profilePictureString = userUpdateDto.getProfilePicture();
+            // Remove o prefixo, se existir (ex.: "data:image/png;base64,")
+            if (profilePictureString.contains(",")) {
+                profilePictureString = profilePictureString.substring(profilePictureString.indexOf(",") + 1);
+            }
+            byte[] imageBytes = Base64.getDecoder().decode(profilePictureString);
+            user.setProfilePicture(imageBytes);
+        }
 
         return new UserProfileResponseDto(userRepository.save(user));
     }

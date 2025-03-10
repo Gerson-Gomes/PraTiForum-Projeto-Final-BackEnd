@@ -7,8 +7,7 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Base64;
 
 @Data
 public class UserProfileResponseDto {
@@ -21,7 +20,8 @@ public class UserProfileResponseDto {
     private String creationDate;
     private String lastEditionDate;
     private SocialMediaDto socialMedia;
-    private byte[] profilePicture;
+    private String profilePicture;
+    private String location;
 
     public UserProfileResponseDto(User user) {
         this.id = user.getId();
@@ -32,10 +32,12 @@ public class UserProfileResponseDto {
         this.birthDate = formatBirthDate(user.getBirthDate());
         this.creationDate = formatDate(user.getCreationDate());
         this.lastEditionDate = formatDate(user.getLastEditionDate());
-        this.profilePicture = user.getProfilePicture();
+        this.location = user.getLocation();
+        this.profilePicture = user.getProfilePicture() != null
+                ? Base64.getEncoder().encodeToString(user.getProfilePicture())
+                : null;
         this.socialMedia = new SocialMediaDto(
-                user.getUserSocialMidia().getGitProfile(),
-                user.getUserSocialMidia().getDiscordProfile(),
+                user.getUserSocialMidia().getGitProfile()                ,
                 user.getUserSocialMidia().getLinkedinProfile(),
                 user.getUserSocialMidia().getInstagramProfile());
     }

@@ -64,6 +64,7 @@ public class User implements UserDetails {
     @Column(name = "location", nullable = true)
     private String location;
 
+    @Lob
     @Column(name = "profile_picture")
     private byte[] profilePicture;
 
