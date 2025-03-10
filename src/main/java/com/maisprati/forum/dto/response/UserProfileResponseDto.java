@@ -7,8 +7,7 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Base64;
 
 @Data
 public class UserProfileResponseDto {
@@ -20,8 +19,9 @@ public class UserProfileResponseDto {
     private String birthDate;
     private String creationDate;
     private String lastEditionDate;
-    private List<SocialMediaDto> socialMedia;
-    private byte[] profilePicture;
+    private SocialMediaDto socialMedia;
+    private String profilePicture;
+    private String location;
 
     public UserProfileResponseDto(User user) {
         this.id = user.getId();
@@ -32,19 +32,14 @@ public class UserProfileResponseDto {
         this.birthDate = formatBirthDate(user.getBirthDate());
         this.creationDate = formatDate(user.getCreationDate());
         this.lastEditionDate = formatDate(user.getLastEditionDate());
-
-        this.profilePicture = user.getProfilePicture();
-
-        if (user.getUserSocialMidia() != null) {
-            this.socialMedia = user.getUserSocialMidia().stream()
-                    .map(sm -> new SocialMediaDto(
-                            sm.getGitProfile(),
-                            sm.getDiscordProfile(),
-                            sm.getLinkedinProfile(),
-                            sm.getInstagramProfile()
-                    ))
-                    .collect(Collectors.toList());
-        }
+        this.location = user.getLocation();
+        this.profilePicture = user.getProfilePicture() != null
+                ? Base64.getEncoder().encodeToString(user.getProfilePicture())
+                : null;
+        this.socialMedia = new SocialMediaDto(
+                user.getUserSocialMidia().getGitProfile()                ,
+                user.getUserSocialMidia().getLinkedinProfile(),
+                user.getUserSocialMidia().getInstagramProfile());
     }
 
     private String formatBirthDate(LocalDate birthDate) {

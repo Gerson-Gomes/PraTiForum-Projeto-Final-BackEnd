@@ -1,6 +1,7 @@
 package com.maisprati.forum.dto.request;
 
 import com.maisprati.forum.dto.SocialMediaDto;
+import com.maisprati.forum.model.UserSocialMidia;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -13,5 +14,15 @@ public class UserUpdateDto {
     private String email;
     private String description;
     private String birthDate;
-    private List<SocialMediaDto> socialMedia;
+    private String location;
+    private SocialMediaDto socialMedia;
+    private String profilePicture;
+
+    public UserSocialMidia toUserSocialMidia(){
+        return new UserSocialMidia(
+                this.socialMedia.getGitProfile(),
+                this.socialMedia.getInstagramProfile(),
+                this.socialMedia.getLinkedinProfile());
+
+    }
 }
