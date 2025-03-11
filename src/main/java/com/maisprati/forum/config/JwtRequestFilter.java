@@ -45,11 +45,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String token = recoverToken(request);
 
         try {
-            if (token != null ) {
+            if (token != null) {
                 authenticateUser(token);
             }
         } catch (Exception e) {
-            System.err.println("Erro de autenticação: " + e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed: " + e.getMessage());
+            return; // Stop further processing
         }
 
         chain.doFilter(request, response);

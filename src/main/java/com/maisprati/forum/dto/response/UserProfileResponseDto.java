@@ -33,13 +33,25 @@ public class UserProfileResponseDto {
         this.creationDate = formatDate(user.getCreationDate());
         this.lastEditionDate = formatDate(user.getLastEditionDate());
         this.location = user.getLocation();
-        this.profilePicture = user.getProfilePicture() != null
+
+        this.profilePicture = (user.getProfilePicture() != null)
                 ? Base64.getEncoder().encodeToString(user.getProfilePicture())
                 : null;
-        this.socialMedia = new SocialMediaDto(
-                user.getUserSocialMidia().getGitProfile()                ,
-                user.getUserSocialMidia().getLinkedinProfile(),
-                user.getUserSocialMidia().getInstagramProfile());
+
+        // Verifica se userSocialMidia é nulo antes de acessá-lo
+        if (user.getUserSocialMidia() != null) {
+            this.socialMedia = new SocialMediaDto(
+                    user.getUserSocialMidia().getGitProfile(),
+                    user.getUserSocialMidia().getLinkedinProfile(),
+                    user.getUserSocialMidia().getInstagramProfile()
+            );
+        } else {
+            this.socialMedia = new SocialMediaDto(
+                   null,
+                    null,
+                    null);
+
+        }
     }
 
     private String formatBirthDate(LocalDate birthDate) {

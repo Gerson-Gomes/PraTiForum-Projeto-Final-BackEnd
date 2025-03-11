@@ -56,6 +56,7 @@ public class TopicController {
     public ResponseEntity<Page<TopicResponseDto>> getAllTopics(
             @ParameterObject Pageable pageable) {
         Page<TopicResponseDto> topicDtos = topicService.getAllTopics(pageable);
+        System.out.println("PASSOU");
         return ResponseEntity.ok(topicDtos);
     }
 
